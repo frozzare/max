@@ -186,7 +186,7 @@ tasks:
       - multi-line array of tasks to run
       - (not required)
     commands:
-      - multi-line array of commands to run (go string formatting supported with arguments)
+      - multi-line array of commands to run (go text template)
       - access environment variables via $NAME
       - (not required)
     usage: string of usage text, e.g "[--name]" (not required)
