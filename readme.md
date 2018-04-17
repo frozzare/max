@@ -109,6 +109,34 @@ $ max default --name max
 Hello max
 ```
 
+### Task with global arguments
+
+Config
+
+```yaml
+args:
+  name: default
+
+tasks:
+  hello:
+    summary: Hello task
+    commands:
+      - echo Hello {{ .name }}
+  default:
+    tasks:
+      - hello
+```
+
+Output
+
+```
+$ max
+Hello default
+
+$ max default --name max
+Hello max
+```
+
 ## Max file spec
 
 The default file name is `max.yml` but you can specific another file by using the `--config` flag.
@@ -120,9 +148,10 @@ Other supported default files are:
 - `max_darwin.yml`
 
 ```yaml
+args: # Global arguments that all tasks can use. Key/Value map that can be used with --key flag.
 tasks: # map of tasks
   task: # task id
-    args: # Map (key/value) of default arguments that can be change with --key when running.
+    args: # Arguments that all tasks can use. Key/Value map that can be used with --key flag.
     deps: [task] # task dependencies, e.g [build, that]
     summary: task summary (not required)
     interval: task interval (cron format) (not required)

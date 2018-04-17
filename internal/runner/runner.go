@@ -17,18 +17,18 @@ import (
 
 // Runner represents a the runner.
 type Runner struct {
+	args   map[string]interface{}
 	All    bool
 	Config *config.Config
 	Once   bool
 }
 
-func (r *Runner) parseArgs() map[string]interface{} {
-	args := map[string]interface{}{}
+func (r *Runner) parseArgs() {
 	input := strings.Join(os.Args[2:], " ")
 	buff := bytes.NewBufferString(input)
 
 	for {
-		r, _, err := buff.ReadRune()
+		rn, _, err := buff.ReadRune()
 
 		if err != nil {
 			break
@@ -38,20 +38,18 @@ func (r *Runner) parseArgs() map[string]interface{} {
 			break
 		}
 
-		if r == '-' {
+		if rn == '-' {
 			if arg, err := buff.ReadString(' '); err == nil {
 				if val, err := buff.ReadString(' '); err == nil || err == io.EOF {
 					if arg[0] == '-' {
 						arg = arg[1:]
 					}
 
-					args[strings.TrimSpace(arg)] = val
+					r.args[strings.TrimSpace(arg)] = val
 				}
 			}
 		}
 	}
-
-	return args
 }
 
 // Run runs the tasks.
@@ -68,7 +66,9 @@ func (r *Runner) Run(id string) error {
 	}
 
 	done := make(chan bool, size)
-	args := r.parseArgs()
+
+	r.args = r.Config.Args
+	r.parseArgs()
 
 	for _, k := range tasks {
 		t := r.Config.Tasks[k]
@@ -100,7 +100,7 @@ func (r *Runner) Run(id string) error {
 					dr.Run(id)
 				}
 
-				if err := t.Run(args); err != nil {
+				if err := t.Run(r.args); err != nil {
 					log.Print(errors.Wrap(err, "max"))
 				}
 

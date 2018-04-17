@@ -16,36 +16,40 @@ import (
 
 // Config represents a config file.
 type Config struct {
-	Version string
+	Args    map[string]interface{}
 	Tasks   map[string]*task.Task
+	Version string
+}
+
+type base struct {
+	Args    map[string]interface{}
+	Tasks   map[string]interface{}
+	Version string
 }
 
 // UnmarshalYAML implements yaml packages interface to unmarshal custom values.
 func (c *Config) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	var config map[string]interface{}
+	var b *base
 
-	if err := unmarshal(&config); err == nil {
-		// Add version if any.
-		if v, ok := config["version"]; ok {
-			c.Version = v.(string)
-		}
-
+	if err := unmarshal(&b); err == nil {
+		c.Args = b.Args
 		c.Tasks = make(map[string]*task.Task)
+		c.Version = b.Version
 
 		// Loop over tasks to include and convert existing maps to tasks.
-		for k, v := range config["tasks"].(map[interface{}]interface{}) {
+		for k, v := range b.Tasks {
 			switch r := v.(type) {
 			case string:
 				if content, err := ioutil.ReadFile(r); err == nil {
 					var t *task.Task
 					if err := yaml.Unmarshal([]byte(content), &t); err == nil {
-						c.Tasks[k.(string)] = t
+						c.Tasks[k] = t
 					}
 				}
 			case map[interface{}]interface{}:
 				var t *task.Task
 				if err := mapstructure.Decode(r, &t); err == nil {
-					c.Tasks[k.(string)] = t
+					c.Tasks[k] = t
 				}
 			}
 		}
