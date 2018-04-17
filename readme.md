@@ -138,7 +138,7 @@ Hello max
 
 Config `max.yml`
 
-```
+```yaml
 tasks:
   hello: !include hello.yml
   default:
@@ -148,7 +148,7 @@ tasks:
 
 Config `hello.yml`
 
-```
+```yaml
 args:
   name: default
 summary: Hello task
