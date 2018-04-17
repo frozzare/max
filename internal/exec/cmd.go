@@ -8,10 +8,20 @@ import (
 )
 
 // Cmd will execute a input cmd string.
-func Cmd(input string) (string, error) {
-	path, err := os.Getwd()
-	if err != nil {
-		return "", err
+func Cmd(input string, args ...string) (string, error) {
+	var path string
+
+	if len(args) > 0 {
+		path = args[0]
+	}
+
+	if len(path) == 0 {
+		wd, err := os.Getwd()
+		if err != nil {
+			return "", err
+		}
+
+		path = wd
 	}
 
 	parts := strings.Fields(input)

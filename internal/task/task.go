@@ -8,7 +8,7 @@ import (
 	"text/template"
 
 	"github.com/frozzare/go/env"
-	"github.com/frozzare/max/pkg/exec"
+	"github.com/frozzare/max/internal/exec"
 )
 
 // Task represents a task.
@@ -16,6 +16,7 @@ type Task struct {
 	Args     map[string]interface{}
 	Commands []string
 	Deps     []string
+	Dir      string
 	Interval string
 	Summary  string
 	Tasks    []string
@@ -61,7 +62,7 @@ func (t *Task) Run(args map[string]interface{}) error {
 			return err
 		}
 
-		res, err := exec.Cmd(c)
+		res, err := exec.Cmd(c, t.Dir)
 		if len(res) > 0 {
 			log.Print(res)
 		}

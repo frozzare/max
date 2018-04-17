@@ -179,8 +179,9 @@ tasks:
   task: task id
     args: Arguments that all tasks can use. Key/Value map that can be used with --key flag.
     deps: [task] # task dependencies, e.g [build, that]
-    summary: task summary (not required)
+    dir: directory to execute commands in
     interval: task interval (cron format) (not required)
+    summary: task summary (not required)
     tasks:
       - multi-line array of tasks to run
       - (not required)
