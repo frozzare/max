@@ -27,6 +27,10 @@ func (r *Runner) parseArgs() {
 	input := strings.Join(os.Args[2:], " ")
 	buff := bytes.NewBufferString(input)
 
+	if r.args == nil {
+		r.args = make(map[string]interface{})
+	}
+
 	for {
 		rn, _, err := buff.ReadRune()
 

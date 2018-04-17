@@ -134,6 +134,38 @@ $ max hello --name max
 Hello max
 ```
 
+### Include task from other files.
+
+Config `max.yml`
+
+```
+tasks:
+  hello: !include hello.yml
+  default:
+    tasks:
+      - hello
+```
+
+Config `hello.yml`
+
+```
+args:
+  name: default
+summary: Hello task
+commands:
+  - echo Hello {{ .name }}
+```
+
+Output
+
+```
+$ max hello
+Hello default
+
+$ max hello --name max
+Hello max
+```
+
 ## Max file spec
 
 The default file name is `max.yml` but you can specific another file by using the `--config` flag.
