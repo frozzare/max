@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -110,11 +111,18 @@ func (r *Runner) Run(id string) error {
 					err = errors.Wrap(err, "max")
 
 					if once {
-						if !strings.Contains(err.Error(), "exit status 1") {
+						status := 1
+
+						if strings.Contains(err.Error(), "exit status") {
+							s := strings.Split(err.Error(), " ")
+							if i, err := strconv.Atoi(s[len(s)-1]); err == nil {
+								status = i
+							}
+						} else {
 							log.Print(err)
 						}
 
-						os.Exit(1)
+						os.Exit(status)
 					} else {
 						log.Print(err)
 					}

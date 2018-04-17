@@ -6,8 +6,8 @@ type List struct {
 }
 
 // NewList creates a new list.
-func NewList(v interface{}) *List {
-	l := &List{}
+func NewList(v interface{}) List {
+	l := List{}
 
 	switch x := v.(type) {
 	case []string:
