@@ -4,7 +4,7 @@
 [[projects]]
   branch = "master"
   name = "github.com/frozzare/go"
-  packages = ["map2"]
+  packages = ["cast","env","map2"]
   revision = "9361d1c040b03309ca45f58beffee0f869bbecc3"
 
 [[projects]]
@@ -18,6 +18,12 @@
   packages = ["."]
   revision = "a557574d6c024ed6e36acc8b610f5f211c91568a"
   version = "1.0.0"
+
+[[projects]]
+  name = "github.com/joho/godotenv"
+  packages = ["."]
+  revision = "a79fa1e548e2c689c241d10173efd51e5d689d5b"
+  version = "v1.2.0"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -40,6 +46,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e9bcdce02d6a94d6a85ca87dcf6b42e0c2c5cfc0548ce058769bc0142627d1a8"
+  inputs-digest = "62d38895fdfb01717a27b48c151eb4423c8bb62ffad404fed33ba30cf20f9031"
   solver-name = "gps-cdcl"
   solver-version = 1
