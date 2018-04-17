@@ -177,10 +177,10 @@ Other supported default files are:
 - `max_darwin.yml`
 
 ```yaml
-args: # Global arguments that all tasks can use. Key/Value map that can be used with --key flag.
-tasks: # map of tasks
-  task: # task id
-    args: # Arguments that all tasks can use. Key/Value map that can be used with --key flag.
+args: Global arguments that all tasks can use. Key/Value map that can be used with --key flag.
+tasks:
+  task: task id
+    args: Arguments that all tasks can use. Key/Value map that can be used with --key flag.
     deps: [task] # task dependencies, e.g [build, that]
     summary: task summary (not required)
     interval: task interval (cron format) (not required)
