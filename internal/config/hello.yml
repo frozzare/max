@@ -1,0 +1,4 @@
+args: [default]
+summary: Hello task
+commands:
+  - echo Hello %s

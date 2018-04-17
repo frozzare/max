@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -9,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/frozzare/max/internal/task"
+	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v2"
 )
 
@@ -16,6 +18,42 @@ import (
 type Config struct {
 	Version string
 	Tasks   map[string]*task.Task
+}
+
+// UnmarshalYAML implements yaml packages interface to unmarshal custom values.
+func (c *Config) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var config map[string]interface{}
+
+	if err := unmarshal(&config); err == nil {
+		// Add version if any.
+		if v, ok := config["version"]; ok {
+			c.Version = v.(string)
+		}
+
+		c.Tasks = make(map[string]*task.Task)
+
+		// Loop over tasks to include and convert existing maps to tasks.
+		for k, v := range config["tasks"].(map[interface{}]interface{}) {
+			switch r := v.(type) {
+			case string:
+				if content, err := ioutil.ReadFile(r); err == nil {
+					var t *task.Task
+					if err := yaml.Unmarshal([]byte(content), &t); err == nil {
+						c.Tasks[k.(string)] = t
+					}
+				}
+			case map[interface{}]interface{}:
+				var t *task.Task
+				if err := mapstructure.Decode(r, &t); err == nil {
+					c.Tasks[k.(string)] = t
+				}
+			}
+		}
+
+		return nil
+	}
+
+	return errors.New("max: can't unmarshal config value")
 }
 
 // ReadContent creates a new config struct from a string.

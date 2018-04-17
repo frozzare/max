@@ -51,4 +51,12 @@ func TestReadFile(t *testing.T) {
 	if c.Tasks["hello"].Summary != "Hello task" {
 		t.Errorf("Expected: 'Hello task', got: %s", c.Tasks["Hello"])
 	}
+
+	if c.Tasks["hello2"] == nil {
+		t.Errorf("Expected: task, got: %v", c.Tasks["hello2"])
+	}
+
+	if c.Tasks["hello2"].Summary != "Hello task" {
+		t.Errorf("Expected: 'Hello task', got: %s", c.Tasks["Hello"])
+	}
 }

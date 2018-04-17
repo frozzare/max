@@ -1,3 +1,4 @@
 tasks:
   hello:
     summary: "Hello task"
+  hello2: !include hello.yml

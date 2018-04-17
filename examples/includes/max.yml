@@ -1,0 +1,5 @@
+tasks:
+  hello: !include hello.yml
+  default:
+    tasks:
+      - hello
