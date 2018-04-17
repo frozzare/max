@@ -6,8 +6,6 @@ import (
 	goexec "os/exec"
 	"regexp"
 	"strings"
-
-	"github.com/frozzare/go/env"
 )
 
 func setVariables(input string) (string, error) {
@@ -22,7 +20,7 @@ func setVariables(input string) (string, error) {
 		input = strings.Replace(input, row[1], "", -1)
 		p := strings.Split(row[1], "=")
 
-		if err := env.Set(p[0], p[1]); err != nil {
+		if err := os.Setenv(p[0], p[1]); err != nil {
 			return input, err
 		}
 	}
