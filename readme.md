@@ -188,7 +188,7 @@ tasks:
       - multi-line array of commands to run (go string formatting supported with arguments)
       - access environment variables via $NAME
       - (not required)
-    usage: string of usage text, e.g [name] (not required)
+    usage: string of usage text, e.g "[--name]" (not required)
 ```
 
 ## License
