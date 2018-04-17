@@ -1,4 +1,7 @@
 tasks:
+  release:
+    commands:
+      - goreleaser --rm-dist
   test:
     commands:
       - go test ./...
