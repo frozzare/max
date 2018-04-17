@@ -2,24 +2,31 @@ package task
 
 import (
 	"bytes"
+	"errors"
 	"log"
 	"regexp"
 	"strings"
 	"text/template"
 
 	"github.com/frozzare/go/env"
-	"github.com/frozzare/max/internal/exec"
+	"github.com/frozzare/max/pkg/exec"
+	"github.com/frozzare/max/pkg/yamllist"
+)
+
+var (
+	// ErrNoCommands is returned when no commands exists.
+	ErrNoCommands = errors.New("no commands")
 )
 
 // Task represents a task.
 type Task struct {
 	Args     map[string]interface{}
-	Commands []string
-	Deps     []string
+	Commands *yamllist.List
+	Deps     *yamllist.List
 	Dir      string
 	Interval string
 	Summary  string
-	Tasks    []string
+	Tasks    *yamllist.List
 	Usage    string
 }
 
@@ -48,13 +55,17 @@ func (t *Task) appendArguments(c string) (string, error) {
 	return buf.String(), nil
 }
 
-// Run runs a task.
+// Run runs task commands.
 func (t *Task) Run(args map[string]interface{}) error {
 	if len(args) > 0 {
 		t.Args = args
 	}
 
-	for _, c := range t.Commands {
+	if len(t.Commands.Values) == 0 {
+		return ErrNoCommands
+	}
+
+	for _, c := range t.Commands.Values {
 		c = t.appendEnvVariables(c)
 
 		c, err := t.appendArguments(c)

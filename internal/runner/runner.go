@@ -88,7 +88,7 @@ func (r *Runner) Run(id string) error {
 		go func(t *task.Task) {
 			for {
 				// Run deps before task.
-				for _, id := range t.Deps {
+				for _, id := range t.Deps.Values {
 					dr := Runner{
 						Config: r.Config,
 						Once:   true,
@@ -98,7 +98,7 @@ func (r *Runner) Run(id string) error {
 				}
 
 				// Run other tasks.
-				for _, id := range t.Tasks {
+				for _, id := range t.Tasks.Values {
 					dr := Runner{
 						Config: r.Config,
 					}

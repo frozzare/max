@@ -4,14 +4,13 @@ import (
 	"testing"
 
 	"github.com/frozzare/go/env"
+	"github.com/frozzare/max/pkg/yamllist"
 )
 
 func TestTask(t *testing.T) {
 	s := &Task{
-		Summary: "Hello task",
-		Commands: []string{
-			"echo $SAY",
-		},
+		Summary:  "Hello task",
+		Commands: yamllist.NewList("echo $SAY"),
 	}
 
 	env.Set("SAY", "Hello")

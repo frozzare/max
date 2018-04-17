@@ -6,7 +6,7 @@ import (
 )
 
 func TestReadContent(t *testing.T) {
-	buf, err := ioutil.ReadFile("./test.yml")
+	buf, err := ioutil.ReadFile("./config.yml")
 
 	if err != nil {
 		t.Errorf("Expected: nil, got: %v", err)
@@ -28,7 +28,7 @@ func TestReadContent(t *testing.T) {
 }
 
 func TestReadFile(t *testing.T) {
-	c, err := ReadFile("./test.yml")
+	c, err := ReadFile("./config.yml")
 
 	if err != nil {
 		t.Errorf("Expected: nil, got: %v", err)
