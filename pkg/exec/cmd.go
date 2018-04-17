@@ -36,11 +36,11 @@ func Cmd(input string) (string, error) {
 	}()
 
 	if err := cmd.Start(); err != nil {
-		return "", err
+		return strings.Join(res, "\n"), err
 	}
 
 	if err := cmd.Wait(); err != nil {
-		return "", err
+		return strings.Join(res, "\n"), err
 	}
 
 	return strings.Join(res, "\n"), nil

@@ -62,13 +62,13 @@ func (t *Task) Run(args map[string]interface{}) error {
 		}
 
 		res, err := exec.Cmd(c)
+		if len(res) > 0 {
+			log.Print(res)
+		}
+
 		if err != nil {
 			log.Print(c)
 			return err
-		}
-
-		if len(res) > 0 {
-			log.Print(res)
 		}
 	}
 

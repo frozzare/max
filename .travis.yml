@@ -4,6 +4,8 @@ go:
   - "1.10"
   - "tip"
 
+before_script:
+  - go build -o max
+
 script:
-  - go test ./...
-  - go vet ./...
+  - ./max test
