@@ -1,5 +1,9 @@
 tasks:
   hello:
+    args: [default]
     summary: Hello task
     commands:
-      - echo Hello
+      - echo Hello %s
+  default:
+    tasks:
+      - hello

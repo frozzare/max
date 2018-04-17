@@ -86,7 +86,7 @@ func (r *Runner) Run(id string, args ...string) error {
 						Quiet:  r.Quiet,
 					}
 
-					dr.Run(id)
+					dr.Run(id, args...)
 				}
 
 				// Run other tasks.
@@ -96,7 +96,7 @@ func (r *Runner) Run(id string, args ...string) error {
 						Quiet:  r.Quiet,
 					}
 
-					dr.Run(id)
+					dr.Run(id, args...)
 				}
 
 				if err := t.Run(toInterface(args)); err != nil {
