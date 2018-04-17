@@ -122,18 +122,15 @@ tasks:
     summary: Hello task
     commands:
       - echo Hello {{ .name }}
-  default:
-    tasks:
-      - hello
 ```
 
 Output
 
 ```
-$ max
+$ max hello
 Hello default
 
-$ max default --name max
+$ max hello --name max
 Hello max
 ```
 
