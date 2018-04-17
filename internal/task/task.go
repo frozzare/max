@@ -5,8 +5,8 @@ import (
 	"log"
 	"regexp"
 	"strings"
+	"text/template"
 
-	"github.com/alecthomas/template"
 	"github.com/frozzare/go/env"
 	"github.com/frozzare/max/pkg/exec"
 )
