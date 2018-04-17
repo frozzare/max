@@ -4,8 +4,31 @@ import (
 	"bufio"
 	"os"
 	goexec "os/exec"
+	"regexp"
 	"strings"
+
+	"github.com/frozzare/go/env"
 )
+
+func setVariables(input string) (string, error) {
+	re := regexp.MustCompile(`(\w+\=\w+)`)
+	match := re.FindAllStringSubmatch(input, -1)
+
+	for _, row := range match {
+		if len(row) < 1 {
+			continue
+		}
+
+		input = strings.Replace(input, row[1], "", -1)
+		p := strings.Split(row[1], "=")
+
+		if err := env.Set(p[0], p[1]); err != nil {
+			return input, err
+		}
+	}
+
+	return strings.TrimLeft(input, " "), nil
+}
 
 // Cmd will execute a input cmd string.
 func Cmd(input string, args ...string) (string, error) {
@@ -22,6 +45,11 @@ func Cmd(input string, args ...string) (string, error) {
 		}
 
 		path = wd
+	}
+
+	input, err := setVariables(input)
+	if err != nil {
+		return "", err
 	}
 
 	parts := strings.Fields(input)
