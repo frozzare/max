@@ -183,10 +183,10 @@ tasks:
     interval: task interval (cron format) (not required)
     summary: task summary (not required)
     tasks:
-      - multi-line array of tasks to run
+      - single/multi-line array of tasks to run
       - (not required)
     commands:
-      - multi-line array of commands to run (go text template)
+      - single/multi-line array of commands to run (go text template)
       - access environment variables via $NAME
       - (not required)
     usage: string of usage text, e.g "[--name]" (not required)

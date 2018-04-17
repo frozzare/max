@@ -22,7 +22,7 @@ var (
 type Task struct {
 	Args     map[string]interface{}
 	Commands yamllist.List
-	Deps     yamllist.List
+	Deps     []string
 	Dir      string
 	Interval string
 	Summary  string
