@@ -82,6 +82,8 @@ func (r *Runner) Run(id string) error {
 			break
 		}
 
+		once := len(t.Interval) == 0 || r.Once
+
 		// Run task.
 		go func(t *task.Task) {
 			for {
@@ -105,11 +107,17 @@ func (r *Runner) Run(id string) error {
 				}
 
 				if err := t.Run(r.args); err != nil {
-					log.Print(errors.Wrap(err, "max"))
+					if !strings.Contains(err.Error(), "exit status 1") {
+						log.Print(errors.Wrap(err, "max"))
+					}
+
+					if once {
+						os.Exit(1)
+					}
 				}
 
 				// If no internal or only once flag is used we should break it.
-				if len(t.Interval) == 0 || r.Once {
+				if once {
 					break
 				}
 
