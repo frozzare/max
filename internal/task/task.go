@@ -2,7 +2,6 @@ package task
 
 import (
 	"bytes"
-	"errors"
 	"log"
 	"regexp"
 	"strings"
@@ -11,11 +10,6 @@ import (
 	"github.com/frozzare/go/env"
 	"github.com/frozzare/max/pkg/exec"
 	"github.com/frozzare/max/pkg/yamllist"
-)
-
-var (
-	// ErrNoCommands is returned when no commands exists.
-	ErrNoCommands = errors.New("no commands")
 )
 
 // Task represents a task.
@@ -59,10 +53,6 @@ func (t *Task) appendArguments(c string) (string, error) {
 func (t *Task) Run(args map[string]interface{}) error {
 	if len(args) > 0 {
 		t.Args = args
-	}
-
-	if len(t.Commands.Values) == 0 {
-		return ErrNoCommands
 	}
 
 	for _, c := range t.Commands.Values {

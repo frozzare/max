@@ -25,7 +25,14 @@ type Runner struct {
 }
 
 func (r *Runner) parseArgs() {
-	input := strings.Join(os.Args[2:], " ")
+	var input string
+
+	if len(os.Args) > 1 {
+		input = strings.Join(os.Args[2:], " ")
+	} else {
+		input = strings.Join(os.Args, " ")
+	}
+
 	buff := bytes.NewBufferString(input)
 
 	if r.args == nil {
