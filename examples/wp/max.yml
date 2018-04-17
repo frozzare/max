@@ -1,0 +1,6 @@
+tasks:
+  wp-cron:
+    summary: "Run WP cron jobs"
+    interval: "* * * * *"
+    commands:
+      - wp cron event run --due-now --path=/path/to/wordpress

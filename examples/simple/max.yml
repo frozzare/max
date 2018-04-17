@@ -1,0 +1,24 @@
+tasks:
+  build:
+    deps: [hello]
+    summary: "Build task"
+    commands:
+      - go build main.go
+  hello:
+    args: [fredrik]
+    summary: "Hello task"
+    commands:
+      - echo "Hello, %s"
+    usage: "[name]"
+  default:
+    summary: "Default task"
+    tasks:
+      - build
+      - country
+  country:
+    deps: [hello]
+    summary: "Country task"
+    commands:
+      - curl http://ip-api.com/json -o data.json
+      - node main.js
+      - rm data.json

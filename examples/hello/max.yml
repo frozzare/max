@@ -1,0 +1,5 @@
+tasks:
+  hello:
+    summary: Hello task
+    commands:
+      - echo Hello
