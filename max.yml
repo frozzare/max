@@ -1,8 +1,10 @@
 tasks:
   release:
+    summary: Release new max version
     commands:
       - goreleaser --rm-dist
   test:
+    summary: Run max tests
     commands:
       - go test ./...
       - go vet ./...
