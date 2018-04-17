@@ -7,7 +7,7 @@ import (
 func TestCmd(t *testing.T) {
 	_, err := Cmd("ls")
 
-	if err == nil {
+	if err != nil {
 		t.Errorf("Expected: nil, got: %s", err)
 	}
 }
