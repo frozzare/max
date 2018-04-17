@@ -1,18 +1,19 @@
 package task
 
 import (
-	"fmt"
+	"bytes"
+	"log"
 	"regexp"
 	"strings"
 
+	"github.com/alecthomas/template"
 	"github.com/frozzare/go/env"
 	"github.com/frozzare/max/pkg/exec"
-	"github.com/frozzare/max/pkg/log"
 )
 
 // Task represents a task.
 type Task struct {
-	Args     []interface{}
+	Args     map[string]interface{}
 	Commands []string
 	Deps     []string
 	Interval string
@@ -32,27 +33,42 @@ func (t *Task) appendEnvVariables(v string) string {
 	return v
 }
 
+func (t *Task) appendArguments(c string) (string, error) {
+	tmpl, err := template.New("main").Parse(c)
+	if err != nil {
+		return "", err
+	}
+
+	var buf bytes.Buffer
+	if err := tmpl.Execute(&buf, t.Args); err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
+}
+
 // Run runs a task.
-func (t *Task) Run(args []interface{}) error {
-	if len(args) == 0 && len(t.Args) > 0 {
-		args = t.Args
+func (t *Task) Run(args map[string]interface{}) error {
+	if len(args) > 0 {
+		t.Args = args
 	}
 
 	for _, c := range t.Commands {
 		c = t.appendEnvVariables(c)
 
-		if len(args) > 0 {
-			c = fmt.Sprintf(c, args...)
+		c, err := t.appendArguments(c)
+		if err != nil {
+			return err
 		}
 
 		res, err := exec.Cmd(c)
 		if err != nil {
-			log.Log(c)
+			log.Print(c)
 			return err
 		}
 
 		if len(res) > 0 {
-			log.Log(res)
+			log.Print(res)
 		}
 	}
 

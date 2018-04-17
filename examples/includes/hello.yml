@@ -1,4 +1,5 @@
-args: [default]
+args:
+  name: 
 summary: Hello task
 commands:
-  - echo Hello %s
+  - echo Hello {{ .name }}

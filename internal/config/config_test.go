@@ -28,17 +28,7 @@ func TestReadContent(t *testing.T) {
 }
 
 func TestReadFile(t *testing.T) {
-	c, err := ReadFile("")
-
-	if err == nil {
-		t.Errorf("Expected: error, got: %v", err)
-	}
-
-	if c != nil {
-		t.Errorf("Expected: nil, got: %v", c)
-	}
-
-	c, err = ReadFile("./test.yml")
+	c, err := ReadFile("./test.yml")
 
 	if err != nil {
 		t.Errorf("Expected: nil, got: %v", err)

@@ -1,14 +1,18 @@
 package runner
 
 import (
+	"bytes"
+	"io"
+	"log"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/frozzare/go/map2"
 	"github.com/frozzare/max/internal/config"
 	"github.com/frozzare/max/internal/task"
-	"github.com/frozzare/max/pkg/log"
-	golog "github.com/go-log/log"
 	"github.com/gorhill/cronexpr"
+	"github.com/pkg/errors"
 )
 
 // Runner represents a the runner.
@@ -16,38 +20,42 @@ type Runner struct {
 	All    bool
 	Config *config.Config
 	Once   bool
-	Quiet  bool
 }
 
-func toInterface(list []string) []interface{} {
-	vals := make([]interface{}, len(list))
-	for i, v := range list {
-		vals[i] = v
+func (r *Runner) parseArgs() map[string]interface{} {
+	args := map[string]interface{}{}
+	input := strings.Join(os.Args[2:], " ")
+	buff := bytes.NewBufferString(input)
+
+	for {
+		r, _, err := buff.ReadRune()
+
+		if err != nil {
+			break
+		}
+
+		if buff.Len() == 0 {
+			break
+		}
+
+		if r == '-' {
+			if arg, err := buff.ReadString(' '); err == nil {
+				if val, err := buff.ReadString(' '); err == nil || err == io.EOF {
+					if arg[0] == '-' {
+						arg = arg[1:]
+					}
+
+					args[strings.TrimSpace(arg)] = val
+				}
+			}
+		}
 	}
-	return vals
+
+	return args
 }
 
 // Run runs the tasks.
-func (r *Runner) Run(id string, args ...string) error {
-	// Output help usage if requested.
-	if id == "help" && len(args) == 1 {
-		id = args[0]
-		t := r.Config.Tasks[id]
-
-		if t == nil {
-			log.Fatalf("Task missing: %s", id)
-		}
-
-		if len(t.Usage) == 0 {
-			return nil
-		}
-
-		log.Logf("Usage:\n  max %s %s", id, t.Usage)
-		log.Logf("\nSummary:\n  %s", t.Summary)
-
-		return nil
-	}
-
+func (r *Runner) Run(id string) error {
 	size := 1
 	tasks := []string{id}
 
@@ -60,12 +68,7 @@ func (r *Runner) Run(id string, args ...string) error {
 	}
 
 	done := make(chan bool, size)
-	errs := make(chan error)
-
-	// Set output log to quiet.
-	if r.Quiet {
-		log.SetLogger(golog.DefaultLogger)
-	}
+	args := r.parseArgs()
 
 	for _, k := range tasks {
 		t := r.Config.Tasks[k]
@@ -83,24 +86,22 @@ func (r *Runner) Run(id string, args ...string) error {
 					dr := Runner{
 						Config: r.Config,
 						Once:   true, // deps can only run once since the are runned in another tasks interval
-						Quiet:  r.Quiet,
 					}
 
-					dr.Run(id, args...)
+					dr.Run(id)
 				}
 
 				// Run other tasks.
 				for _, id := range t.Tasks {
 					dr := Runner{
 						Config: r.Config,
-						Quiet:  r.Quiet,
 					}
 
-					dr.Run(id, args...)
+					dr.Run(id)
 				}
 
-				if err := t.Run(toInterface(args)); err != nil {
-					log.Log(err)
+				if err := t.Run(args); err != nil {
+					log.Print(errors.Wrap(err, "max"))
 				}
 
 				// If no internal or only once flag is used we should break it.
@@ -121,7 +122,6 @@ func (r *Runner) Run(id string, args ...string) error {
 	for {
 		if len(done) == size {
 			close(done)
-			close(errs)
 			break
 		}
 

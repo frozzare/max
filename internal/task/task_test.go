@@ -16,7 +16,7 @@ func TestTask(t *testing.T) {
 
 	env.Set("SAY", "Hello")
 
-	err := s.Run([]interface{}{})
+	err := s.Run(map[string]interface{}{})
 
 	if err != nil {
 		t.Errorf("Expected: nil, got: %s", err)

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -66,7 +67,10 @@ func Execute(version string) {
 	pflag.StringVarP(&configFile, "config", "c", "", "sets the config file")
 	pflag.BoolVarP(&listFlag, "list", "l", false, "lists tasks with summary description")
 	pflag.BoolVarP(&onceFlag, "once", "o", false, "runs tasks once and ignore interval")
-	pflag.BoolVar(&versionFlag, "version", false, "show Max version")
+	pflag.BoolVarP(&versionFlag, "version", "v", false, "show version")
+	pflag.CommandLine.ParseErrorsWhitelist = pflag.ParseErrorsWhitelist{
+		UnknownFlags: true,
+	}
 	pflag.Parse()
 
 	// Output max verison.
@@ -105,10 +109,30 @@ func Execute(version string) {
 	// Output list of tasks.
 	if listFlag {
 		w := tabwriter.NewWriter(os.Stdout, 0, 8, 0, '\t', 0)
-		//		for k, t := range c.Tasks {
-		//			fmt.Fprintf(w, "* %s: \t%s\n", k, t.(*task.Task).Summary)
-		//		}
+		for k, t := range c.Tasks {
+			fmt.Fprintf(w, "* %s: \t%s\n", k, t.Summary)
+		}
 		w.Flush()
+		return
+	}
+
+	// Output help usage if requested.
+	if task == "help" && len(args) == 1 {
+		id := args[0]
+		t := c.Tasks[id]
+
+		if t == nil {
+			log.Fatalf("Task missing: %s", id)
+		}
+
+		if len(t.Usage) != 0 {
+			log.Printf("Usage:\n  max %s %s\n", id, t.Usage)
+		}
+
+		if len(t.Summary) != 0 {
+			log.Printf("Summary:\n  %s", t.Summary)
+		}
+
 		return
 	}
 
@@ -118,5 +142,5 @@ func Execute(version string) {
 		Once:   onceFlag,
 	}
 
-	runner.Run(task, args...)
+	runner.Run(task)
 }

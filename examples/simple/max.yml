@@ -5,11 +5,12 @@ tasks:
     commands:
       - go build main.go
   hello:
-    args: [fredrik]
+    args:
+      name: fredrik
     summary: "Hello task"
     commands:
-      - echo "Hello, %s"
-    usage: "[name]"
+      - echo Hello, {{ .name }}
+    usage: "[--name]"
   default:
     summary: "Default task"
     tasks:

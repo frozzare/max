@@ -64,11 +64,12 @@ Config
 ```yaml
 tasks:
   hello:
-    args: [default]
+    args:
+      name: default
     summary: Hello task
     commands:
-      - echo Hello %s
-    usage: [name]
+      - echo Hello {{ .name }}
+    usage: "[--name]"
 ```
 
 Output
@@ -77,7 +78,7 @@ Output
 $ max hello
 Hello default
 
-$ max hello max
+$ max hello --name max
 Hello max
 ```
 
@@ -88,10 +89,11 @@ Config
 ```yaml
 tasks:
   hello:
-    args: [default]
+    args:
+      name: default
     summary: Hello task
     commands:
-      - echo Hello %s
+      - echo Hello {{ .name }}
   default:
     tasks:
       - hello
@@ -103,7 +105,7 @@ Output
 $ max
 Hello default
 
-$ max default max
+$ max default --name max
 Hello max
 ```
 
@@ -120,7 +122,7 @@ Other supported default files are:
 ```yaml
 tasks: # map of tasks
   task: # task id
-    args: [max] # List of default arguments.
+    args: # Map (key/value) of default arguments that can be change with --key when running.
     deps: [task] # task dependencies, e.g [build, that]
     summary: task summary (not required)
     interval: task interval (cron format) (not required)

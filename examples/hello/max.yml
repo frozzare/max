@@ -1,9 +1,12 @@
 tasks:
   hello:
-    args: [default]
+    args:
+      first: default
+      last: task
     summary: Hello task
     commands:
-      - echo Hello %s
+      - echo Hello {{ .first }} {{ .last }}
+    usage: "[--first] [--last]"
   default:
     tasks:
       - hello
