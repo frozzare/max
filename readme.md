@@ -141,9 +141,6 @@ Config `max.yml`
 ```yaml
 tasks:
   hello: !include hello.yml
-  default:
-    tasks:
-      - hello
 ```
 
 Config `hello.yml`
