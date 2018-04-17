@@ -179,7 +179,7 @@ tasks:
   task: task id
     args: Arguments that all tasks can use. Key/Value map that can be used with --key flag.
     deps: [task] # task dependencies, e.g [build, that]
-    dir: directory to execute commands in
+    dir: Custom directory to execute commands in. Default is where the max file is located.
     interval: task interval (cron format) (not required)
     summary: task summary (not required)
     tasks:
