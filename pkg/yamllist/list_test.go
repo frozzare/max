@@ -9,7 +9,7 @@ import (
 )
 
 type task struct {
-	Commands *List
+	Commands List
 }
 
 type test struct {

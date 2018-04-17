@@ -10,8 +10,12 @@ import (
 	"strings"
 
 	"github.com/frozzare/max/internal/task"
-	"github.com/mitchellh/mapstructure"
 	"gopkg.in/yaml.v2"
+)
+
+var (
+	// ErrUnmarshal is returned when config can't be unmarshaled.
+	ErrUnmarshal = errors.New("max: can't unmarshal config value")
 )
 
 // Config represents a config file.
@@ -44,12 +48,21 @@ func (c *Config) UnmarshalYAML(unmarshal func(interface{}) error) error {
 					var t *task.Task
 					if err := yaml.Unmarshal([]byte(content), &t); err == nil {
 						c.Tasks[k] = t
+					} else {
+						return ErrUnmarshal
 					}
 				}
 			case map[interface{}]interface{}:
 				var t *task.Task
-				if err := mapstructure.Decode(r, &t); err == nil {
-					c.Tasks[k] = t
+
+				if buf, err := yaml.Marshal(r); err == nil {
+					if err := yaml.Unmarshal(buf, &t); err == nil {
+						c.Tasks[k] = t
+					} else {
+						return ErrUnmarshal
+					}
+				} else {
+					return ErrUnmarshal
 				}
 			}
 		}
@@ -57,7 +70,20 @@ func (c *Config) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		return nil
 	}
 
-	return errors.New("max: can't unmarshal config value")
+	return ErrUnmarshal
+}
+
+func convert(a interface{}) interface{} {
+	switch v := a.(type) {
+	case map[interface{}]interface{}:
+		res := make(map[string]interface{})
+		for k, v := range v {
+			res[k.(string)] = v
+		}
+		return res
+	default:
+		return v
+	}
 }
 
 // ReadContent creates a new config struct from a string.

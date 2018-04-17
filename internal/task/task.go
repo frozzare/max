@@ -21,12 +21,12 @@ var (
 // Task represents a task.
 type Task struct {
 	Args     map[string]interface{}
-	Commands *yamllist.List
-	Deps     *yamllist.List
+	Commands yamllist.List
+	Deps     yamllist.List
 	Dir      string
 	Interval string
 	Summary  string
-	Tasks    *yamllist.List
+	Tasks    yamllist.List
 	Usage    string
 }
 

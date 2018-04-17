@@ -108,6 +108,7 @@ func Execute(version string) {
 
 	// Output list of tasks.
 	if listFlag {
+		fmt.Println(c.Tasks)
 		w := tabwriter.NewWriter(os.Stdout, 0, 8, 0, '\t', 0)
 		for k, t := range c.Tasks {
 			fmt.Fprintf(w, "* %s: \t%s\n", k, t.Summary)

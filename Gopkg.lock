@@ -8,12 +8,6 @@
   revision = "9361d1c040b03309ca45f58beffee0f869bbecc3"
 
 [[projects]]
-  name = "github.com/go-log/log"
-  packages = [".","log"]
-  revision = "37e2e1f19306361e1fc152a1839f1236149cb4e4"
-  version = "v0.1.0"
-
-[[projects]]
   name = "github.com/gorhill/cronexpr"
   packages = ["."]
   revision = "a557574d6c024ed6e36acc8b610f5f211c91568a"
@@ -24,12 +18,6 @@
   packages = ["."]
   revision = "a79fa1e548e2c689c241d10173efd51e5d689d5b"
   version = "v1.2.0"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/mitchellh/mapstructure"
-  packages = ["."]
-  revision = "00c29f56e2386353d58c599509e8dc3801b0d716"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -52,6 +40,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "19e2b4b1ff1ecd8fecdb1977948678011e9bd1deaada1779a32aff612122f480"
+  inputs-digest = "8ddb9c9c9db871cade01db32bdbe3e3093607da771f6e72b35447da491c01355"
   solver-name = "gps-cdcl"
   solver-version = 1
