@@ -85,7 +85,7 @@ func (r *Runner) Run(id string) error {
 				for _, id := range t.Deps {
 					dr := Runner{
 						Config: r.Config,
-						Once:   true, // deps can only run once since the are runned in another tasks interval
+						Once:   true,
 					}
 
 					dr.Run(id)
