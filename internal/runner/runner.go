@@ -74,7 +74,7 @@ func (r *Runner) Run(id string) error {
 		t := r.Config.Tasks[k]
 
 		if t == nil {
-			log.Fatalf("Task missing: %s", k)
+			log.Fatalf("max: task missing: %s", k)
 			break
 		}
 
