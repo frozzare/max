@@ -107,12 +107,16 @@ func (r *Runner) Run(id string) error {
 				}
 
 				if err := t.Run(r.args); err != nil {
-					if !strings.Contains(err.Error(), "exit status 1") {
-						log.Print(errors.Wrap(err, "max"))
-					}
+					err = errors.Wrap(err, "max")
 
 					if once {
+						if !strings.Contains(err.Error(), "exit status 1") {
+							log.Print(err)
+						}
+
 						os.Exit(1)
+					} else {
+						log.Print(err)
 					}
 				}
 
