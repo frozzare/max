@@ -9,7 +9,7 @@ tasks:
       name: fredrik
     summary: "Hello task"
     commands:
-      - echo Hello, {{ .name }}
+      - echo Hello {{ .name }}
     usage: "[--name]"
   default:
     summary: "Default task"

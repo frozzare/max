@@ -1,11 +1,11 @@
 tasks:
   hello:
     args:
-      first: default
+      first_a: default
       last: task
     summary: Hello task
     commands:
-      - echo Hello {{ .first }} {{ .last }}
+      - echo Hello {{ .first_a }} {{ .last }}
     usage: "[--first] [--last]"
   default:
     tasks:

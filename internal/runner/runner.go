@@ -57,7 +57,10 @@ func (r *Runner) parseArgs() {
 						arg = arg[1:]
 					}
 
-					r.args[strings.TrimSpace(arg)] = val
+					key := strings.TrimSpace(arg)
+					key = strings.Replace(key, "-", "_", -1)
+
+					r.args[key] = val
 				}
 			}
 		}
@@ -65,16 +68,20 @@ func (r *Runner) parseArgs() {
 }
 
 // Run runs the tasks.
-func (r *Runner) Run(id string) error {
+func (r *Runner) Run(id string) {
 	size := 1
 	tasks := []string{id}
 
 	// Run all tasks if defined.
 	if r.All {
-		if keys, err := map2.Keys(r.Config.Tasks); err == nil {
-			size = len(r.Config.Tasks)
-			tasks = keys.([]string)
+		keys, err := map2.Keys(r.Config.Tasks)
+		if err != nil {
+			log.Fatalf("max: %s", err.Error())
+			return
 		}
+
+		size = len(r.Config.Tasks)
+		tasks = keys.([]string)
 	}
 
 	done := make(chan bool, size)
@@ -158,6 +165,4 @@ func (r *Runner) Run(id string) error {
 
 		time.Sleep(1 * time.Second)
 	}
-
-	return nil
 }

@@ -7,6 +7,8 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/imdario/mergo"
+
 	"github.com/frozzare/go/env"
 	"github.com/frozzare/max/pkg/exec"
 	"github.com/frozzare/max/pkg/yamllist"
@@ -49,20 +51,37 @@ func (t *Task) appendArguments(c string) (string, error) {
 	return buf.String(), nil
 }
 
+func (t *Task) prepareString(c string) (string, error) {
+	return t.appendArguments(t.appendEnvVariables(c))
+}
+
 // Run runs task commands.
 func (t *Task) Run(args map[string]interface{}) error {
 	if len(args) > 0 {
+		if err := mergo.Merge(&args, t.Args); err != nil {
+			return err
+		}
+
 		t.Args = args
 	}
 
-	for _, c := range t.Commands.Values {
-		c = t.appendEnvVariables(c)
+	// Support usage of environment variabels and arguments in directory field.
+	d, err := t.prepareString(t.Dir)
+	if err != nil {
+		return err
+	}
 
-		c, err := t.appendArguments(c)
+	// Trim spaces if any exists.
+	t.Dir = strings.TrimSpace(d)
+
+	for _, c := range t.Commands.Values {
+		// Prepare string with environment variables and arguments.
+		c, err := t.prepareString(c)
 		if err != nil {
 			return err
 		}
 
+		// Execute command.
 		if err := exec.Exec(c, t.Dir); err != nil {
 			log.Print(c)
 			return err
