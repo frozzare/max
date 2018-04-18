@@ -35,17 +35,21 @@ func readConfig(path string) (*config.Config, error) {
 
 		if err == nil {
 			c, err = config.ReadContent(string(buf))
+
+			if err != nil {
+				return nil, errors.Wrap(err, "max")
+			}
 		}
 	} else {
 		c, err = config.ReadFile(path)
 	}
 
 	if err != nil {
-		return nil, errors.Wrap(err, "Reading config")
+		return nil, errors.Wrap(err, "max")
 	}
 
 	if c == nil {
-		return nil, errors.New("Bad config")
+		return nil, errors.New("max: bad config")
 	}
 
 	return c, nil

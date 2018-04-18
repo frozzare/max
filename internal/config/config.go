@@ -87,19 +87,6 @@ func (c *Config) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	return ErrUnmarshal
 }
 
-func convert(a interface{}) interface{} {
-	switch v := a.(type) {
-	case map[interface{}]interface{}:
-		res := make(map[string]interface{})
-		for k, v := range v {
-			res[k.(string)] = v
-		}
-		return res
-	default:
-		return v
-	}
-}
-
 // ReadContent creates a new config struct from a string.
 func ReadContent(content string) (*Config, error) {
 	var config *Config
