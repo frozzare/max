@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/frozzare/go/http2"
 	"github.com/frozzare/max/internal/task"
 	"gopkg.in/yaml.v2"
 )
@@ -44,7 +45,20 @@ func (c *Config) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		for k, v := range b.Tasks {
 			switch r := v.(type) {
 			case string:
-				if content, err := ioutil.ReadFile(r); err == nil {
+				if strings.Contains(r, "http") {
+					client := http2.NewClient(nil)
+					res, err := client.Get(r)
+					if err == nil {
+						var t *task.Task
+						if err := yaml.NewDecoder(res.Body).Decode(&t); err == nil {
+							c.Tasks[k] = t
+						} else {
+							return ErrUnmarshal
+						}
+					} else {
+						return ErrUnmarshal
+					}
+				} else if content, err := ioutil.ReadFile(r); err == nil {
 					var t *task.Task
 					if err := yaml.Unmarshal([]byte(content), &t); err == nil {
 						c.Tasks[k] = t

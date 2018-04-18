@@ -16,7 +16,13 @@ import (
 const usage = `
 Runs the specified task(s).
 
+Commands:
+
+  help [task]           show task help.
+  version               print Max version
+
 Options:
+
 `
 
 func readConfig(path string) (*config.Config, error) {
@@ -60,24 +66,19 @@ func Execute(version string) {
 		configFile  string
 		listFlag    bool
 		onceFlag    bool
-		versionFlag bool
+		verboseFlag bool
 	)
 
 	pflag.BoolVarP(&allFlag, "all", "a", false, "runs all tasks")
 	pflag.StringVarP(&configFile, "config", "c", "", "sets the config file")
 	pflag.BoolVarP(&listFlag, "list", "l", false, "lists tasks with summary description")
 	pflag.BoolVarP(&onceFlag, "once", "o", false, "runs tasks once and ignore interval")
-	pflag.BoolVarP(&versionFlag, "version", "v", false, "show version")
+	pflag.BoolVarP(&verboseFlag, "verbose", "v", false, "verbose mode")
+
 	pflag.CommandLine.ParseErrorsWhitelist = pflag.ParseErrorsWhitelist{
 		UnknownFlags: true,
 	}
 	pflag.Parse()
-
-	// Output max verison.
-	if versionFlag {
-		log.Printf("Max version: %s\n", version)
-		return
-	}
 
 	// Find arguments to run.
 	args := pflag.Args()
@@ -92,6 +93,12 @@ func Execute(version string) {
 		} else {
 			args = []string{}
 		}
+	}
+
+	// Output max verison.
+	if task == "version" {
+		log.Printf("Max version: %s\n", version)
+		return
 	}
 
 	if task == "help" && len(args) == 0 {
@@ -138,9 +145,10 @@ func Execute(version string) {
 	}
 
 	runner := runner.Runner{
-		All:    allFlag,
-		Config: c,
-		Once:   onceFlag,
+		All:     allFlag,
+		Config:  c,
+		Once:    onceFlag,
+		Verbose: verboseFlag,
 	}
 
 	runner.Run(task)

@@ -24,6 +24,7 @@ type Task struct {
 	Summary  string
 	Tasks    yamllist.List
 	Usage    string
+	Verbose  bool
 }
 
 func (t *Task) appendEnvVariables(v string) string {
@@ -79,6 +80,10 @@ func (t *Task) Run(args map[string]interface{}) error {
 		c, err := t.prepareString(c)
 		if err != nil {
 			return err
+		}
+
+		if t.Verbose {
+			log.Print(c)
 		}
 
 		// Execute command.

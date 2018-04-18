@@ -18,10 +18,11 @@ import (
 
 // Runner represents a the runner.
 type Runner struct {
-	args   map[string]interface{}
-	All    bool
-	Config *config.Config
-	Once   bool
+	args    map[string]interface{}
+	All     bool
+	Config  *config.Config
+	Once    bool
+	Verbose bool
 }
 
 func (r *Runner) parseArgs() {
@@ -105,8 +106,9 @@ func (r *Runner) Run(id string) {
 				// Run deps before task.
 				for _, id := range t.Deps {
 					dr := Runner{
-						Config: r.Config,
-						Once:   true,
+						Config:  r.Config,
+						Once:    true,
+						Verbose: r.Verbose,
 					}
 
 					dr.Run(id)
@@ -115,11 +117,14 @@ func (r *Runner) Run(id string) {
 				// Run other tasks.
 				for _, id := range t.Tasks.Values {
 					dr := Runner{
-						Config: r.Config,
+						Config:  r.Config,
+						Verbose: r.Verbose,
 					}
 
 					dr.Run(id)
 				}
+
+				t.Verbose = r.Verbose
 
 				if err := t.Run(r.args); err != nil {
 					err = errors.Wrap(err, "max")
