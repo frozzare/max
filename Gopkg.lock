@@ -4,7 +4,11 @@
 [[projects]]
   branch = "master"
   name = "github.com/frozzare/go"
-  packages = ["cast","env","map2"]
+  packages = [
+    "cast",
+    "env",
+    "map2"
+  ]
   revision = "9361d1c040b03309ca45f58beffee0f869bbecc3"
 
 [[projects]]
@@ -32,14 +36,38 @@
   version = "v1.0.1"
 
 [[projects]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["ssh/terminal"]
+  revision = "d6449816ce06963d9d136eee5a56fca5b0616e7e"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/sys"
+  packages = [
+    "unix",
+    "windows"
+  ]
+  revision = "b126b21c05a91c856b027c16779c12e3bf236954"
+
+[[projects]]
   name = "gopkg.in/yaml.v2"
   packages = ["."]
   revision = "5420a8b6744d3b0345ab293f6fcba19c978f1183"
   version = "v2.2.1"
 
+[[projects]]
+  name = "mvdan.cc/sh"
+  packages = [
+    "interp",
+    "syntax"
+  ]
+  revision = "406aa91bb579fc3746db9a55cd9194a7e7db6e92"
+  version = "v2.3.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8ddb9c9c9db871cade01db32bdbe3e3093607da771f6e72b35447da491c01355"
+  inputs-digest = "f072b766925a356e40e610a3dd79fa7b5ac09dfe073e9d6aa7dc3bba36a140f9"
   solver-name = "gps-cdcl"
   solver-version = 1
