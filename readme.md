@@ -12,16 +12,7 @@ go get -u github.com/frozzare/max
 
 ## Usage
 
-Running `max help` will show a output of options.
-
-```
-Options:
-  -a, --all             runs all tasks
-  -c, --config string   sets the config file
-  -l, --list            lists tasks with summary description
-  -o, --once            runs tasks once and ignore interval
-  -v, --version         show max version
-```
+Running `max help` will print help output.
 
 ## Task help
 
