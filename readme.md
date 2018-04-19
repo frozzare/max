@@ -1,7 +1,5 @@
 # max [![Build Status](https://travis-ci.org/frozzare/max.svg?branch=master)](https://travis-ci.org/frozzare/max) [![GoDoc](https://godoc.org/github.com/frozzare/max?status.svg)](http://godoc.org/github.com/frozzare/max) [![Go Report Card](https://goreportcard.com/badge/github.com/frozzare/max)](https://goreportcard.com/report/github.com/frozzare/max)
 
-> Work in progress, not production ready
-
 Max is a YAML-based task runner.
 
 ## Installation
