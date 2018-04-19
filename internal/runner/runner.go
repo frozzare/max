@@ -2,9 +2,11 @@ package runner
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -68,6 +70,21 @@ func (r *Runner) parseArgs() {
 	}
 }
 
+// Task returns a task by name if it exists.
+func (r *Runner) Task(name string) *task.Task {
+	if r.Config == nil || r.Config.Tasks[name] == nil {
+		return nil
+	}
+
+	for _, n := range []string{fmt.Sprintf("%s_%s", name, runtime.GOOS), name} {
+		if t := r.Config.Tasks[n]; t != nil {
+			return t
+		}
+	}
+
+	return nil
+}
+
 // Run runs the tasks.
 func (r *Runner) Run(id string) {
 	size := 1
@@ -91,7 +108,7 @@ func (r *Runner) Run(id string) {
 	r.parseArgs()
 
 	for _, k := range tasks {
-		t := r.Config.Tasks[k]
+		t := r.Task(k)
 
 		if t == nil {
 			log.Fatalf("max: task missing: %s", k)

@@ -167,7 +167,7 @@ Other supported default files are:
 ```yaml
 args: Global arguments that all tasks can use. Key/Value map that can be used with --key flag.
 tasks:
-  task: task id
+  task: task id (os specific tasks can be loaded before real task id, e.g build_windows is loaded when build is called on windows)
     args: Arguments that all tasks can use. Key/Value map that can be used with --key flag.
     deps: [task] # task dependencies, e.g [build, that]
     dir: Custom directory to execute commands in. Default is where the max file is located.

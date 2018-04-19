@@ -128,10 +128,17 @@ func Execute(version string) {
 		return
 	}
 
+	runner := runner.Runner{
+		All:     allFlag,
+		Config:  c,
+		Once:    onceFlag,
+		Verbose: verboseFlag,
+	}
+
 	// Output help usage if requested.
 	if task == "help" && len(args) == 1 {
 		id := args[0]
-		t := c.Tasks[id]
+		t := runner.Task(id)
 
 		if t == nil {
 			log.Fatalf("Task missing: %s", id)
@@ -146,13 +153,6 @@ func Execute(version string) {
 		}
 
 		return
-	}
-
-	runner := runner.Runner{
-		All:     allFlag,
-		Config:  c,
-		Once:    onceFlag,
-		Verbose: verboseFlag,
 	}
 
 	runner.Run(task)
