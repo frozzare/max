@@ -12,7 +12,10 @@ func TestCmd(t *testing.T) {
 		t.Error("Expected: path, got: none")
 	}
 
-	if err := Exec("ls", path); err != nil {
+	if err := Exec(&Options{
+		Dir:     path,
+		Command: "ls",
+	}); err != nil {
 		t.Errorf("Expected: nil, got: %s", err)
 	}
 }

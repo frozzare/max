@@ -11,7 +11,7 @@
   branch = "master"
   name = "github.com/frozzare/go"
   packages = ["cast","env","http2","map2"]
-  revision = "9361d1c040b03309ca45f58beffee0f869bbecc3"
+  revision = "35b1cc1e4b1377809424e62d25f2ff3c2cf29cb4"
 
 [[projects]]
   name = "github.com/gorhill/cronexpr"
@@ -53,13 +53,13 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
-  revision = "d6449816ce06963d9d136eee5a56fca5b0616e7e"
+  revision = "db7d12313a59cd5b727192a287195e2cdfa40049"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix","windows"]
-  revision = "b126b21c05a91c856b027c16779c12e3bf236954"
+  revision = "f67ecc163a74fbeea4cb1db0a101dcd07201464a"
 
 [[projects]]
   name = "gopkg.in/yaml.v2"

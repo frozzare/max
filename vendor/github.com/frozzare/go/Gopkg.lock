@@ -19,9 +19,15 @@
   packages = ["."]
   revision = "ae77be60afb1dcacde03767a8c37337fad28ac14"
 
+[[projects]]
+  branch = "master"
+  name = "github.com/rainycape/unidecode"
+  packages = ["."]
+  revision = "cb7f23ec59bec0d61b19c56cd88cee3d0cc1870c"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d329051a1f3fe0b03cd9f961b8f91a6090f08a29fc09b1d61592f8feac2c6f6c"
+  inputs-digest = "9fa6f8038ca5bc0f1305a7e42ee7730bd77e912f105491a3c7418b2ea64c90f2"
   solver-name = "gps-cdcl"
   solver-version = 1

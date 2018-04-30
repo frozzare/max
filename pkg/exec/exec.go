@@ -8,12 +8,19 @@ import (
 	"mvdan.cc/sh/syntax"
 )
 
+// Options represents execute options.
+type Options struct {
+	Dir     string
+	Env     []string
+	Command string
+}
+
 // Exec will execute a input cmd string.
-func Exec(input string, args ...string) error {
+func Exec(opts *Options) error {
 	var path string
 
-	if len(args) > 0 {
-		path = args[0]
+	if len(opts.Dir) > 0 {
+		path = opts.Dir
 	}
 
 	if len(path) == 0 {
@@ -25,12 +32,18 @@ func Exec(input string, args ...string) error {
 		path = wd
 	}
 
-	p, err := syntax.NewParser().Parse(strings.NewReader(input), "")
+	p, err := syntax.NewParser().Parse(strings.NewReader(opts.Command), "")
 	if err != nil {
 		return err
 	}
 
+	env := os.Environ()
+	for _, e := range opts.Env {
+		env = append(env, e)
+	}
+
 	r := interp.Runner{
+		Env:    env,
 		Dir:    path,
 		Exec:   interp.DefaultExec,
 		Open:   interp.OpenDevImpls(interp.DefaultOpen),
