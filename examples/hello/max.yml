@@ -1,3 +1,6 @@
+variables:
+  NAME: Fredrik
+
 tasks:
   hello:
     args:
@@ -10,3 +13,6 @@ tasks:
   default:
     tasks:
       - hello
+  hej:
+    commands:
+      - echo Hej $NAME
