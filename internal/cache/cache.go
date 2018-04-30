@@ -51,6 +51,13 @@ func (c *Cache) Delete(key string) error {
 	})
 }
 
+// Flush flushes the cache.
+func (c *Cache) Flush() error {
+	return c.db.Update(func(tx *bolt.Tx) error {
+		return tx.DeleteBucket([]byte(c.bucket))
+	})
+}
+
 // Get gets a value from the cache and returns it or a error.
 func (c *Cache) Get(key string) ([]byte, error) {
 	var v []byte

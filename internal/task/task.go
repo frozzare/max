@@ -27,6 +27,17 @@ type Task struct {
 	Verbose  bool
 }
 
+// PrintUsage print usage of task.
+func (t *Task) PrintUsage(id string) {
+	if len(t.Usage) != 0 {
+		log.Printf("Usage:\n  max %s %s\n", id, t.Usage)
+	}
+
+	if len(t.Summary) != 0 {
+		log.Printf("Summary:\n  %s", t.Summary)
+	}
+}
+
 func (t *Task) appendEnvVariables(v string) string {
 	r := regexp.MustCompile(`\$[a-zA-Z_]+[a-zA-Z0-9_]*`)
 	m := r.FindAllString(v, -1)

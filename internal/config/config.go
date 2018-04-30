@@ -36,7 +36,8 @@ type base struct {
 	Version string
 }
 
-func createCache() (*cache.Cache, error) {
+// CreateCache creates a new cache.
+func CreateCache() (*cache.Cache, error) {
 	dir, err := homedir.Dir()
 	if err != nil {
 		return nil, err
@@ -47,7 +48,7 @@ func createCache() (*cache.Cache, error) {
 
 // Default set default values to config struct.
 func (c *Config) Default() {
-	if cache, err := createCache(); err == nil {
+	if cache, err := CreateCache(); err == nil {
 		c.cache = cache
 	}
 }
@@ -103,13 +104,12 @@ func (c *Config) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 // ReadContent creates a new config struct from a string.
 func ReadContent(content string) (*Config, error) {
-	var config *Config
+	config := &Config{}
+	config.Default()
 
 	if err := yaml.Unmarshal([]byte(content), &config); err != nil {
-		return &Config{}, err
+		return nil, err
 	}
-
-	config.Default()
 
 	return config, nil
 }
@@ -152,13 +152,12 @@ func ReadFile(args ...string) (*Config, error) {
 		return nil, err
 	}
 
-	var config *Config
+	config := &Config{}
+	config.Default()
 
 	if err := yaml.Unmarshal(dat, &config); err != nil {
-		return &Config{}, err
+		return nil, err
 	}
-
-	config.Default()
 
 	return config, nil
 }
