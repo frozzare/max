@@ -15,6 +15,7 @@ import (
 	"github.com/frozzare/max/internal/config"
 	"github.com/frozzare/max/internal/task"
 	"github.com/gorhill/cronexpr"
+	"github.com/imdario/mergo"
 	"github.com/pkg/errors"
 )
 
@@ -139,6 +140,12 @@ func (r *Runner) Run(id string) {
 					}
 
 					dr.Run(id)
+				}
+
+				// Merge global variabels with task variables.
+				if err := mergo.Merge(&t.Variables, r.Config.Variables); err != nil {
+					log.Print(errors.Wrap(err, "max"))
+					break
 				}
 
 				t.Verbose = r.Verbose

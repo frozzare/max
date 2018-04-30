@@ -24,16 +24,18 @@ var (
 
 // Config represents a config file.
 type Config struct {
-	cache   *cache.Cache
-	Args    map[string]interface{}
-	Tasks   map[string]*task.Task
-	Version string
+	cache     *cache.Cache
+	Args      map[string]interface{}
+	Tasks     map[string]*task.Task
+	Variables map[string]string
+	Version   string
 }
 
 type base struct {
-	Args    map[string]interface{}
-	Tasks   map[string]interface{}
-	Version string
+	Args      map[string]interface{}
+	Tasks     map[string]interface{}
+	Variables map[string]string
+	Version   string
 }
 
 // CreateCache creates a new cache.
@@ -60,6 +62,7 @@ func (c *Config) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal(&b); err == nil {
 		c.Args = b.Args
 		c.Tasks = make(map[string]*task.Task)
+		c.Variables = b.Variables
 		c.Version = b.Version
 
 		// Loop over tasks to include and convert existing maps to tasks.
