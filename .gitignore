@@ -1,4 +1,10 @@
+# Example files
 examples/simple/main
 examples/simple/country
+
+# Dist files
 dist
 max
+
+# Testing files
+cache.db
