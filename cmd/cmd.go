@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/frozzare/max/internal/runner"
@@ -55,7 +56,7 @@ func Execute() {
 	pflag.Parse()
 
 	// Bail if help flag.
-	if os.Args[len(os.Args)-1] == "--help" {
+	if strings.Contains("-help", os.Args[len(os.Args)-1]) {
 		return
 	}
 
