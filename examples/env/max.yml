@@ -1,0 +1,9 @@
+variables:
+  NAME: Fredrik
+
+tasks:
+  hello:
+    variables:
+      HELLO: Hello
+    commands:
+      - echo $HELLO, $WORLD $NAME!
