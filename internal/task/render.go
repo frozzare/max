@@ -14,11 +14,17 @@ func renderEnvVariables(v string, variables map[string]string) string {
 	m := r.FindAllString(v, -1)
 
 	for _, e := range m {
-		if k := variables[e[1:]]; len(k) > 0 {
-			v = strings.Replace(v, e, k, -1)
-		} else {
-			v = strings.Replace(v, e, env.Get(e[1:]), -1)
+		s := env.Get(e[1:])
+
+		if len(s) == 0 {
+			s = variables[e[1:]]
 		}
+
+		if len(s) == 0 {
+			continue
+		}
+
+		v = strings.Replace(v, e, s, -1)
 	}
 
 	return v
