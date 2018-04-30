@@ -1,5 +1,6 @@
 tasks:
   hello: !include hello.yml
+  hello2: !include https://gist.githubusercontent.com/frozzare/cb3e8b98373ac03a17c44f1c223957d2/raw/9f90e9421336531c29de1d8b6ee955934d81852a/hello.yml
   default:
     tasks:
       - hello

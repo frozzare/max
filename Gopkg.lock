@@ -2,13 +2,15 @@
 
 
 [[projects]]
+  name = "github.com/coreos/bbolt"
+  packages = ["."]
+  revision = "583e8937c61f1af6513608ccc75c97b6abdf4ff9"
+  version = "v1.3.0"
+
+[[projects]]
   branch = "master"
   name = "github.com/frozzare/go"
-  packages = [
-    "cast",
-    "env",
-    "map2"
-  ]
+  packages = ["cast","env","http2","map2"]
   revision = "9361d1c040b03309ca45f58beffee0f869bbecc3"
 
 [[projects]]
@@ -28,6 +30,12 @@
   packages = ["."]
   revision = "a79fa1e548e2c689c241d10173efd51e5d689d5b"
   version = "v1.2.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/mitchellh/go-homedir"
+  packages = ["."]
+  revision = "b8bc1bf767474819792c23f32d8286a45736f1c6"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -50,10 +58,7 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = [
-    "unix",
-    "windows"
-  ]
+  packages = ["unix","windows"]
   revision = "b126b21c05a91c856b027c16779c12e3bf236954"
 
 [[projects]]
@@ -64,16 +69,13 @@
 
 [[projects]]
   name = "mvdan.cc/sh"
-  packages = [
-    "interp",
-    "syntax"
-  ]
+  packages = ["interp","syntax"]
   revision = "406aa91bb579fc3746db9a55cd9194a7e7db6e92"
   version = "v2.3.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d28d73ded286ca407efa8ecf1261adaa35f22366bfd6f7914aebec9181bd0ab3"
+  inputs-digest = "eb031f6d3337d459ea8115b0b89217c3635548e143c6fb94136ecc9d8e43dc3e"
   solver-name = "gps-cdcl"
   solver-version = 1

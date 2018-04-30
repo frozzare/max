@@ -9,18 +9,22 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/frozzare/go/http2"
+	"github.com/frozzare/max/internal/cache"
 	"github.com/frozzare/max/internal/task"
+	"github.com/mitchellh/go-homedir"
 	"gopkg.in/yaml.v2"
 )
 
 var (
 	// ErrUnmarshal is returned when config can't be unmarshaled.
 	ErrUnmarshal = errors.New("max: can't unmarshal config value")
+	// ErrCreateCache is returned when cache can't be created.
+	ErrCreateCache = errors.New("max: can't create cache")
 )
 
 // Config represents a config file.
 type Config struct {
+	cache   *cache.Cache
 	Args    map[string]interface{}
 	Tasks   map[string]*task.Task
 	Version string
@@ -30,6 +34,22 @@ type base struct {
 	Args    map[string]interface{}
 	Tasks   map[string]interface{}
 	Version string
+}
+
+func createCache() (*cache.Cache, error) {
+	dir, err := homedir.Dir()
+	if err != nil {
+		return nil, err
+	}
+
+	return cache.New(filepath.Join(dir, ".max"))
+}
+
+// Default set default values to config struct.
+func (c *Config) Default() {
+	if cache, err := createCache(); err == nil {
+		c.cache = cache
+	}
 }
 
 // UnmarshalYAML implements yaml packages interface to unmarshal custom values.
@@ -46,18 +66,12 @@ func (c *Config) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			switch r := v.(type) {
 			case string:
 				if strings.Contains(r, "http") {
-					client := http2.NewClient(nil)
-					res, err := client.Get(r)
-					if err == nil {
-						var t *task.Task
-						if err := yaml.NewDecoder(res.Body).Decode(&t); err == nil {
-							c.Tasks[k] = t
-						} else {
-							return ErrUnmarshal
-						}
-					} else {
+					t, err := includeHTTPTask(r, c.cache)
+					if err != nil {
 						return ErrUnmarshal
 					}
+
+					c.Tasks[k] = t
 				} else if content, err := ioutil.ReadFile(r); err == nil {
 					var t *task.Task
 					if err := yaml.Unmarshal([]byte(content), &t); err == nil {
@@ -94,6 +108,8 @@ func ReadContent(content string) (*Config, error) {
 	if err := yaml.Unmarshal([]byte(content), &config); err != nil {
 		return &Config{}, err
 	}
+
+	config.Default()
 
 	return config, nil
 }
@@ -141,6 +157,8 @@ func ReadFile(args ...string) (*Config, error) {
 	if err := yaml.Unmarshal(dat, &config); err != nil {
 		return &Config{}, err
 	}
+
+	config.Default()
 
 	return config, nil
 }
