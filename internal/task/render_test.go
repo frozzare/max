@@ -1,6 +1,10 @@
 package task
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/frozzare/go/env"
+)
 
 func TestRenderEnvVariables(t *testing.T) {
 	c := renderEnvVariables("echo Hello $NAME", map[string]string{
@@ -10,6 +14,18 @@ func TestRenderEnvVariables(t *testing.T) {
 	if c != "echo Hello Fredrik" {
 		t.Fatal("Expected command to be 'echo Hello Fredrik'")
 	}
+
+	env.Set("NAME", "Fredrik2")
+
+	c = renderEnvVariables("echo Hello $NAME", map[string]string{
+		"NAME": "Fredrik",
+	})
+
+	if c != "echo Hello Fredrik2" {
+		t.Fatal("Expected command to be 'echo Hello Fredrik2'")
+	}
+
+	env.Set("NAME", "")
 }
 
 func TestRenderCommand(t *testing.T) {
