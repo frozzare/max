@@ -37,7 +37,6 @@ func Execute() {
 	}
 
 	var (
-		allFlag     bool
 		configFile  string
 		listFlag    bool
 		onceFlag    bool
@@ -45,7 +44,6 @@ func Execute() {
 	)
 
 	pflag.CommandLine = pflag.NewFlagSet(os.Args[0], pflag.ContinueOnError)
-	pflag.BoolVarP(&allFlag, "all", "a", false, "runs all tasks")
 	pflag.StringVarP(&configFile, "config", "c", "", "sets the config file")
 	pflag.BoolVarP(&listFlag, "list", "l", false, "lists tasks with summary description")
 	pflag.BoolVarP(&onceFlag, "once", "o", false, "runs tasks once and ignore interval")

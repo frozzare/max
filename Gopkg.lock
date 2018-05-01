@@ -40,7 +40,7 @@
 [[projects]]
   branch = "master"
   name = "github.com/frozzare/go"
-  packages = ["cast","env","http2","map2"]
+  packages = ["cast","env","http2"]
   revision = "35b1cc1e4b1377809424e62d25f2ff3c2cf29cb4"
 
 [[projects]]
@@ -112,6 +112,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "20079c16d4a6e463e76f82c954944641c458f4c594d7ad00dfb9017043ee89c0"
+  inputs-digest = "134eb1987ba845f6c4acd58ea0f4058094e664377443a6a9e096beaf6a6eafcc"
   solver-name = "gps-cdcl"
   solver-version = 1
