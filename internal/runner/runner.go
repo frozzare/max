@@ -90,11 +90,14 @@ func (r *Runner) exec(t *task.Task) error {
 			return err
 		}
 		r.engine = engine
-		fmt.Println("docker")
 	}
 
 	if r.engine == nil {
 		r.engine = local.New(backendConfig)
+	}
+
+	if r.Verbose {
+		log.Printf("max: using %s engine\n", r.engine.Name())
 	}
 
 	defer func() {

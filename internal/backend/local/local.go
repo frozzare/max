@@ -20,6 +20,11 @@ func New(config *config.Backend) backend.Engine {
 	return &engine{config}
 }
 
+// Name returns engine name.
+func (e *engine) Name() string {
+	return "system"
+}
+
 // Setup setups local engine.
 func (e *engine) Setup(ctx context.Context, t *task.Task) error {
 	return nil

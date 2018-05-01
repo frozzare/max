@@ -40,6 +40,11 @@ func New(config *config.Backend) (backend.Engine, error) {
 	}, nil
 }
 
+// Name returns engine name.
+func (e *engine) Name() string {
+	return "docker"
+}
+
 // Setup setups the docker engine.
 func (e *engine) Setup(ctx context.Context, task *task.Task) error {
 	for _, vol := range e.volumes {
