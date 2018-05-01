@@ -13,6 +13,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/frozzare/max/internal/backend"
+	"github.com/frozzare/max/internal/backend/config"
 	"github.com/frozzare/max/internal/task"
 )
 
@@ -22,7 +23,7 @@ type engine struct {
 }
 
 // New returns a new Docker Engine using the given client.
-func New() (backend.Engine, error) {
+func New(config *config.Backend) (backend.Engine, error) {
 	client, err := client.NewEnvClient()
 	if err != nil {
 		return nil, err
@@ -71,6 +72,17 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 		}
 	}
 
+	var cmds []string
+
+	for _, c := range t.Commands.Values {
+		c, err := t.Prepare(c)
+		if err != nil {
+			return err
+		}
+
+		cmds = append(cmds, c)
+	}
+
 	config := &container.Config{
 		AttachStdout: true,
 		AttachStderr: true,
@@ -78,7 +90,7 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 		Volumes:      toVolumes(t.Docker.Volumes),
 		WorkingDir:   t.Docker.Context,
 		Image:        t.Docker.Image,
-		Cmd:          append([]string{"sh", "-c"}, t.Commands.Values...),
+		Cmd:          append([]string{"sh", "-c"}, cmds...),
 		Entrypoint:   strings.Split(t.Docker.Entrypoint, " "),
 	}
 

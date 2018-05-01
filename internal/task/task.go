@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/frozzare/max/internal/backend/config"
-	"github.com/frozzare/max/pkg/exec"
 	"github.com/frozzare/max/pkg/yamllist"
 )
 
@@ -25,10 +24,12 @@ type Task struct {
 	Verbose   bool
 }
 
+// ID returns the task id.
 func (t *Task) ID() string {
 	return t.id
 }
 
+// SetID sets the task id.
 func (t *Task) SetID(id string) {
 	t.id = id
 }
@@ -44,44 +45,20 @@ func (t *Task) PrintUsage(id string) {
 	}
 }
 
-func (t *Task) prepareString(c string) (string, error) {
-	return renderCommand(renderEnvVariables(c, t.Variables), t.Args)
-}
-
-// Run runs task commands.
-func (t *Task) Run() error {
+// Prepare prepares the command and directory.
+func (t *Task) Prepare(c string) (string, error) {
 	// Support usage of environment variabels and arguments in directory field.
 	d, err := t.prepareString(t.Dir)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// Trim spaces if any exists.
 	t.Dir = strings.TrimSpace(d)
 
-	for _, c := range t.Commands.Values {
-		// Prepare string with environment variables and arguments.
-		c, err := t.prepareString(c)
-		if err != nil {
-			return err
-		}
+	return t.prepareString(c)
+}
 
-		if t.Verbose {
-			log.Print(c)
-		}
-
-		opts := &exec.Options{
-			Dir:     t.Dir,
-			Env:     toEnv(t.Variables),
-			Command: c,
-		}
-
-		// Execute command.
-		if err := exec.Exec(opts); err != nil {
-			log.Print(c)
-			return err
-		}
-	}
-
-	return nil
+func (t *Task) prepareString(c string) (string, error) {
+	return renderCommand(renderEnvVariables(c, t.Variables), t.Args)
 }

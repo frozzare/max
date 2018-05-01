@@ -13,7 +13,9 @@ import (
 	"time"
 
 	"github.com/frozzare/max/internal/backend"
+	backendConfig "github.com/frozzare/max/internal/backend/config"
 	"github.com/frozzare/max/internal/backend/docker"
+	"github.com/frozzare/max/internal/backend/local"
 	"github.com/frozzare/max/internal/config"
 	"github.com/frozzare/max/internal/task"
 	"github.com/gorhill/cronexpr"
@@ -75,6 +77,26 @@ func (r *Runner) Run(id string) error {
 }
 
 func (r *Runner) exec(t *task.Task) error {
+	backendConfig := &backendConfig.Backend{
+		Stdin:  r.Stdin,
+		Stdout: r.Stdout,
+		Stderr: r.Stderr,
+	}
+
+	// Use docker if docker configuration is not nil.
+	if t.Docker != nil {
+		engine, err := docker.New(backendConfig)
+		if err != nil {
+			return err
+		}
+		r.engine = engine
+		fmt.Println("docker")
+	}
+
+	if r.engine == nil {
+		r.engine = local.New(backendConfig)
+	}
+
 	defer func() {
 		r.engine.Destroy(r.ctx, t)
 	}()
@@ -84,16 +106,6 @@ func (r *Runner) exec(t *task.Task) error {
 	}
 
 	t = r.prepareTask(t)
-
-	// Use docker if docker configuration is not nil.
-	if t.Docker != nil {
-		engine, err := docker.New()
-		if err != nil {
-			return err
-		}
-		r.engine = engine
-		fmt.Println("docker")
-	}
 
 	// Run deps before task.
 	for _, id := range t.Deps {

@@ -1,6 +1,7 @@
 package exec
 
 import (
+	"io"
 	"os"
 	"strings"
 
@@ -13,6 +14,9 @@ type Options struct {
 	Dir     string
 	Env     []string
 	Command string
+	Stdin   io.Reader
+	Stdout  io.Writer
+	Stderr  io.Writer
 }
 
 // Exec will execute a input cmd string.
@@ -47,9 +51,9 @@ func Exec(opts *Options) error {
 		Dir:    path,
 		Exec:   interp.DefaultExec,
 		Open:   interp.OpenDevImpls(interp.DefaultOpen),
-		Stdin:  os.Stdin,
-		Stdout: os.Stdout,
-		Stderr: os.Stderr,
+		Stdin:  opts.Stdin,
+		Stdout: opts.Stdout,
+		Stderr: opts.Stderr,
 	}
 
 	if err = r.Reset(); err != nil {

@@ -1,17 +1,19 @@
 package runner
 
 import (
+	"bytes"
+	"strings"
 	"testing"
 
-	"github.com/frozzare/max/internal/backend/local"
 	"github.com/frozzare/max/internal/config"
 	"github.com/frozzare/max/internal/task"
 	"github.com/frozzare/max/pkg/yamllist"
 )
 
 func TestRunner(t *testing.T) {
+	var buf bytes.Buffer
+
 	runner := New(
-		Engine(local.New()),
 		Config(&config.Config{
 			Tasks: map[string]*task.Task{
 				"hello": &task.Task{
@@ -23,9 +25,18 @@ func TestRunner(t *testing.T) {
 				"NAME": "Fredrik",
 			},
 		}),
+		Verbose(true),
 	)
+
+	runner.Stdout = &buf
 
 	if err := runner.Run("hello"); err != nil {
 		t.Errorf("Expected: nil, got: %s", err)
+	}
+
+	got := strings.TrimSpace(buf.String())
+
+	if got != "Hello Fredrik" {
+		t.Errorf("Expected: 'Hello Fredrik', got: %s", got)
 	}
 }

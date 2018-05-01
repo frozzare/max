@@ -3,17 +3,21 @@ package local
 import (
 	"context"
 	"io"
+	"log"
 
 	"github.com/frozzare/max/internal/backend"
+	"github.com/frozzare/max/internal/backend/config"
 	"github.com/frozzare/max/internal/task"
+	"github.com/frozzare/max/pkg/exec"
 )
 
 type engine struct {
+	config *config.Backend
 }
 
 // New creates a new local engine.
-func New() backend.Engine {
-	return &engine{}
+func New(config *config.Backend) backend.Engine {
+	return &engine{config}
 }
 
 // Setup setups local engine.
@@ -23,7 +27,33 @@ func (e *engine) Setup(ctx context.Context, t *task.Task) error {
 
 // Exec executes a task.
 func (e *engine) Exec(ctx context.Context, t *task.Task) error {
-	return t.Run()
+	for _, c := range t.Commands.Values {
+		c, err := t.Prepare(c)
+		if err != nil {
+			return err
+		}
+
+		if t.Verbose {
+			log.Print(c)
+		}
+
+		opts := &exec.Options{
+			Dir:     t.Dir,
+			Env:     toEnv(t.Variables),
+			Command: c,
+			Stdin:   e.config.Stdin,
+			Stdout:  e.config.Stdout,
+			Stderr:  e.config.Stderr,
+		}
+
+		// Execute command.
+		if err := exec.Exec(opts); err != nil {
+			log.Print(c)
+			return err
+		}
+	}
+
+	return nil
 }
 
 // Logs returns logs from the local engine.

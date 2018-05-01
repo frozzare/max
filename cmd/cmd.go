@@ -7,7 +7,6 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/frozzare/max/internal/backend/local"
 	"github.com/frozzare/max/internal/runner"
 	"github.com/spf13/pflag"
 )
@@ -87,7 +86,6 @@ func Execute() {
 	// Create a new runner.
 	runner := runner.New(
 		runner.Config(c),
-		runner.Engine(local.New()),
 		runner.Once(onceFlag),
 		runner.Verbose(verboseFlag),
 	)
