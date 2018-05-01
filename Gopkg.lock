@@ -20,12 +20,6 @@
   version = "1.0.0"
 
 [[projects]]
-  name = "github.com/imdario/mergo"
-  packages = ["."]
-  revision = "9d5f1277e9a8ed20c3684bda8fde67c05628518c"
-  version = "v0.3.4"
-
-[[projects]]
   name = "github.com/joho/godotenv"
   packages = [".","autoload"]
   revision = "a79fa1e548e2c689c241d10173efd51e5d689d5b"
@@ -76,6 +70,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "fe0ce5c8cf4b4acf9900e63e68157db94f99f174855254a13e865cafcf899bde"
+  inputs-digest = "cc0ac3df07e58cd5d627e1dfea6845019bdadaedfbd453b014fcc14a29f874a4"
   solver-name = "gps-cdcl"
   solver-version = 1

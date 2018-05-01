@@ -6,7 +6,6 @@ import (
 
 	"github.com/frozzare/max/pkg/exec"
 	"github.com/frozzare/max/pkg/yamllist"
-	"github.com/imdario/mergo"
 )
 
 // Task represents a task.
@@ -40,12 +39,14 @@ func (t *Task) prepareString(c string) (string, error) {
 
 // Run runs task commands.
 func (t *Task) Run(args map[string]interface{}) error {
-	if len(args) > 0 {
-		if err := mergo.Merge(&args, t.Args); err != nil {
-			return err
-		}
+	if t.Args == nil {
+		t.Args = make(map[string]interface{})
+	}
 
-		t.Args = args
+	if len(args) > 0 {
+		for k, v := range args {
+			t.Args[k] = v
+		}
 	}
 
 	// Support usage of environment variabels and arguments in directory field.
