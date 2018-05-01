@@ -4,6 +4,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/frozzare/max/internal/backend/config"
 	"github.com/frozzare/max/pkg/exec"
 	"github.com/frozzare/max/pkg/yamllist"
 )
@@ -14,12 +15,22 @@ type Task struct {
 	Commands  yamllist.List
 	Deps      []string
 	Dir       string
+	Docker    *config.Docker
+	id        string
 	Interval  string
 	Summary   string
 	Tasks     yamllist.List
 	Usage     string
 	Variables map[string]string
 	Verbose   bool
+}
+
+func (t *Task) ID() string {
+	return t.id
+}
+
+func (t *Task) SetID(id string) {
+	t.id = id
 }
 
 // PrintUsage print usage of task.
@@ -38,17 +49,7 @@ func (t *Task) prepareString(c string) (string, error) {
 }
 
 // Run runs task commands.
-func (t *Task) Run(args map[string]interface{}) error {
-	if t.Args == nil {
-		t.Args = make(map[string]interface{})
-	}
-
-	if len(args) > 0 {
-		for k, v := range args {
-			t.Args[k] = v
-		}
-	}
-
+func (t *Task) Run() error {
 	// Support usage of environment variabels and arguments in directory field.
 	d, err := t.prepareString(t.Dir)
 	if err != nil {

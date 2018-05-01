@@ -7,6 +7,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"github.com/frozzare/max/internal/backend/local"
 	"github.com/frozzare/max/internal/runner"
 	"github.com/spf13/pflag"
 )
@@ -85,12 +86,13 @@ func Execute() {
 		return
 	}
 
-	runner := runner.Runner{
-		All:     allFlag,
-		Config:  c,
-		Once:    onceFlag,
-		Verbose: verboseFlag,
-	}
+	// Create a new runner.
+	runner := runner.New(
+		runner.Config(c),
+		runner.Engine(local.New()),
+		runner.Once(onceFlag),
+		runner.Verbose(verboseFlag),
+	)
 
 	// Output help usage if requested.
 	if task == "help" && len(args) == 1 {
@@ -106,5 +108,8 @@ func Execute() {
 		return
 	}
 
-	runner.Run(task)
+	// Run and log error.
+	if err := runner.Run(task); err != nil {
+		log.Fatalf("max: %s", err.Error())
+	}
 }

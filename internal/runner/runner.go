@@ -2,29 +2,144 @@ package runner
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"runtime"
-	"strconv"
 	"strings"
 	"time"
 
-	"github.com/frozzare/go/map2"
+	"github.com/frozzare/max/internal/backend"
+	"github.com/frozzare/max/internal/backend/docker"
 	"github.com/frozzare/max/internal/config"
 	"github.com/frozzare/max/internal/task"
-	"github.com/gorhill/cronexpr"
 	"github.com/pkg/errors"
+	"golang.org/x/sync/errgroup"
 )
 
 // Runner represents a the runner.
 type Runner struct {
 	args    map[string]interface{}
-	All     bool
+	ctx     context.Context
+	engine  backend.Engine
 	Config  *config.Config
 	Once    bool
+	opts    []Option
 	Verbose bool
+}
+
+// New creates a new runner.
+func New(opts ...Option) *Runner {
+	r := &Runner{
+		opts: opts,
+		ctx:  context.Background(),
+	}
+
+	for _, opts := range opts {
+		opts(r)
+	}
+
+	return r
+}
+
+func (r *Runner) exec(t *task.Task) error {
+	t = r.prepareTask(t)
+
+	// Use docker if docker configuration is not nil.
+	if t.Docker != nil {
+		engine, err := docker.New()
+		if err != nil {
+			return err
+		}
+		r.engine = engine
+	}
+
+	// Run deps before task.
+	for _, id := range t.Deps {
+		if err := New(append(r.opts, Once(true))...).Run(id); err != nil {
+			return err
+		}
+	}
+
+	// Run other tasks.
+	for _, id := range t.Tasks.Values {
+		if err := New(r.opts...).Run(id); err != nil {
+			return err
+		}
+	}
+
+	// Execute task in engine.
+	if err := r.engine.Exec(t); err != nil {
+		return err
+	}
+
+	for {
+		exited, err := r.engine.Wait(t)
+		if err != nil {
+			return err
+		}
+
+		if exited {
+			break
+		}
+	}
+
+	// Get logs from engine.
+	rc, err := r.engine.Logs(t)
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		buf := new(bytes.Buffer)
+		buf.ReadFrom(rc)
+		log.Print(buf.String())
+		rc.Close()
+	}()
+
+	return nil
+}
+
+func (r *Runner) execAll(t *task.Task) <-chan error {
+	var g errgroup.Group
+	done := make(chan error)
+
+	g.Go(func() error {
+		return r.exec(t)
+	})
+
+	go func() {
+		done <- g.Wait()
+		close(done)
+	}()
+
+	return done
+}
+
+func (r *Runner) prepareTask(t *task.Task) *task.Task {
+	// Merge global variables with task variables.
+	for k, v := range r.Config.Variables {
+		t.Variables[k] = v
+	}
+
+	t.Verbose = r.Verbose
+
+	r.args = r.Config.Args
+	r.parseArgs()
+
+	if t.Args == nil {
+		t.Args = make(map[string]interface{})
+	}
+
+	if len(r.args) > 0 {
+		for k, v := range r.args {
+			t.Args[k] = v
+		}
+	}
+
+	return t
 }
 
 func (r *Runner) parseArgs() {
@@ -85,111 +200,48 @@ func (r *Runner) Task(name string) *task.Task {
 	return nil
 }
 
-// Run runs the tasks.
-func (r *Runner) Run(id string) {
-	size := 1
-	tasks := []string{id}
+// Run runs a task.
+func (r *Runner) Run(id string) error {
+	task := r.Task(id)
 
-	// Run all tasks if defined.
-	if r.All {
-		keys, err := map2.Keys(r.Config.Tasks)
+	if task == nil {
+		return fmt.Errorf("task missing: %s", id)
+	}
+
+	done := make(chan bool, 1)
+
+	task.SetID(id)
+
+	defer func() {
+		r.engine.Destroy(task)
+	}()
+
+	if err := r.engine.Setup(task); err != nil {
+		return err
+	}
+
+	var e error
+
+	select {
+	case <-r.ctx.Done():
+		close(done)
+		return errors.New("context is done")
+	case err := <-r.execAll(task):
 		if err != nil {
-			log.Fatalf("max: %s", err.Error())
-			return
+			e = err
 		}
-
-		size = len(r.Config.Tasks)
-		tasks = keys.([]string)
+		done <- true
 	}
 
-	done := make(chan bool, size)
-
-	r.args = r.Config.Args
-	r.parseArgs()
-
-	for _, k := range tasks {
-		t := r.Task(k)
-
-		if t == nil {
-			log.Fatalf("max: task missing: %s", k)
-			break
-		}
-
-		once := len(t.Interval) == 0 || r.Once
-
-		// Run task.
-		go func(t *task.Task) {
-			for {
-				// Run deps before task.
-				for _, id := range t.Deps {
-					dr := Runner{
-						Config:  r.Config,
-						Once:    true,
-						Verbose: r.Verbose,
-					}
-
-					dr.Run(id)
-				}
-
-				// Run other tasks.
-				for _, id := range t.Tasks.Values {
-					dr := Runner{
-						Config:  r.Config,
-						Verbose: r.Verbose,
-					}
-
-					dr.Run(id)
-				}
-
-				// Merge global variables with task variables.
-				for k, v := range r.Config.Variables {
-					t.Variables[k] = v
-				}
-
-				t.Verbose = r.Verbose
-
-				if err := t.Run(r.args); err != nil {
-					err = errors.Wrap(err, "max")
-
-					if once {
-						status := 1
-
-						if strings.Contains(err.Error(), "exit status") {
-							s := strings.Split(err.Error(), " ")
-							if i, err := strconv.Atoi(s[len(s)-1]); err == nil {
-								status = i
-							}
-						} else {
-							log.Print(err)
-						}
-
-						os.Exit(status)
-					} else {
-						log.Print(err)
-					}
-				}
-
-				// If no internal or only once flag is used we should break it.
-				if once {
-					break
-				}
-
-				// Wait until next time we should run the task.
-				nextTime := cronexpr.MustParse(t.Interval).Next(time.Now())
-				time.Sleep(time.Until(nextTime))
-			}
-
-			done <- true
-		}(t)
-	}
-
-	// Wait for all tasks to be done.
+	// Wait for task to be done.
 	for {
-		if len(done) == size {
+		if len(done) == 1 {
 			close(done)
 			break
 		}
 
 		time.Sleep(1 * time.Second)
 	}
+
+	return e
 }

@@ -1,0 +1,37 @@
+package runner
+
+import (
+	"github.com/frozzare/max/internal/backend"
+	"github.com/frozzare/max/internal/config"
+)
+
+// Option configures a runtime option.
+type Option func(*Runner)
+
+// Config returns an option configured with a config value.
+func Config(config *config.Config) Option {
+	return func(r *Runner) {
+		r.Config = config
+	}
+}
+
+// Engine returns an option configured with a runner engine.
+func Engine(engine backend.Engine) Option {
+	return func(r *Runner) {
+		r.engine = engine
+	}
+}
+
+// Once returns an option configured with a once value.
+func Once(once bool) Option {
+	return func(r *Runner) {
+		r.Once = once
+	}
+}
+
+// Verbose returns an option configured with a verbose value.
+func Verbose(verbose bool) Option {
+	return func(r *Runner) {
+		r.Verbose = verbose
+	}
+}

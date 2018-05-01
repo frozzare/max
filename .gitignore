@@ -1,6 +1,7 @@
 # Example files
-examples/simple/main
-examples/simple/country
+examples/project/main
+examples/project/country
+examples/docker/main
 
 # Dist files
 dist

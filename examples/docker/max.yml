@@ -1,0 +1,23 @@
+tasks:
+  build:
+    docker:
+      context: /go/src/app
+      image: golang:1.10
+      volumes:
+        - .:/go/src/app
+    commands:
+      - go build -o main
+  hello:
+    docker:
+      image: ubuntu:latest
+    commands:
+      - echo Hello
+  hello2:
+    docker:
+      image: ubuntu:latest
+    commands:
+      - echo Hello2
+  default:
+    tasks:
+      - hello
+      - hello2
