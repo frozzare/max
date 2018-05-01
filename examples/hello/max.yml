@@ -16,3 +16,7 @@ tasks:
   hej:
     commands:
       - echo Hej $NAME
+  hellocron:
+    interval: "* * * * * *"
+    commands:
+      - echo Hello, world!

@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -15,6 +16,7 @@ import (
 	"github.com/frozzare/max/internal/backend/docker"
 	"github.com/frozzare/max/internal/config"
 	"github.com/frozzare/max/internal/task"
+	"github.com/gorhill/cronexpr"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
@@ -27,14 +29,20 @@ type Runner struct {
 	Config  *config.Config
 	Once    bool
 	opts    []Option
+	Stdin   io.Reader
+	Stdout  io.Writer
+	Stderr  io.Writer
 	Verbose bool
 }
 
 // New creates a new runner.
 func New(opts ...Option) *Runner {
 	r := &Runner{
-		opts: opts,
-		ctx:  context.Background(),
+		opts:   opts,
+		ctx:    context.Background(),
+		Stdin:  os.Stdin,
+		Stdout: os.Stdout,
+		Stderr: os.Stderr,
 	}
 
 	for _, opts := range opts {
@@ -44,7 +52,37 @@ func New(opts ...Option) *Runner {
 	return r
 }
 
+// Run runs a task.
+func (r *Runner) Run(id string) error {
+	task := r.Task(id)
+
+	if task == nil {
+		return fmt.Errorf("task missing: %s", id)
+	}
+
+	task.SetID(id)
+
+	var e error
+
+	select {
+	case err := <-r.execAll(task):
+		if err != nil {
+			e = err
+		}
+	}
+
+	return e
+}
+
 func (r *Runner) exec(t *task.Task) error {
+	defer func() {
+		r.engine.Destroy(r.ctx, t)
+	}()
+
+	if err := r.engine.Setup(r.ctx, t); err != nil {
+		return err
+	}
+
 	t = r.prepareTask(t)
 
 	// Use docker if docker configuration is not nil.
@@ -54,6 +92,7 @@ func (r *Runner) exec(t *task.Task) error {
 			return err
 		}
 		r.engine = engine
+		fmt.Println("docker")
 	}
 
 	// Run deps before task.
@@ -71,12 +110,12 @@ func (r *Runner) exec(t *task.Task) error {
 	}
 
 	// Execute task in engine.
-	if err := r.engine.Exec(t); err != nil {
+	if err := r.engine.Exec(r.ctx, t); err != nil {
 		return err
 	}
 
 	for {
-		exited, err := r.engine.Wait(t)
+		exited, err := r.engine.Wait(r.ctx, t)
 		if err != nil {
 			return err
 		}
@@ -87,17 +126,62 @@ func (r *Runner) exec(t *task.Task) error {
 	}
 
 	// Get logs from engine.
-	rc, err := r.engine.Logs(t)
+	rc, err := r.engine.Logs(r.ctx, t)
 	if err != nil {
 		return err
 	}
 
-	go func() {
-		buf := new(bytes.Buffer)
-		buf.ReadFrom(rc)
-		log.Print(buf.String())
-		rc.Close()
-	}()
+	if rc != nil {
+		go func() {
+			buf := new(bytes.Buffer)
+			buf.ReadFrom(rc)
+			log.Print(buf.String())
+			rc.Close()
+		}()
+	}
+
+	return nil
+}
+
+func (r *Runner) execInterval(t *task.Task) error {
+	once := len(t.Interval) == 0 || r.Once
+
+	for {
+		select {
+		case <-r.ctx.Done():
+			return errors.New("cancelled")
+		default:
+			break
+		}
+
+		if err := r.exec(t); err != nil {
+			if once {
+				err = errors.Wrap(err, "max")
+				status := 1
+
+				if strings.Contains(err.Error(), "exit status") {
+					s := strings.Split(err.Error(), " ")
+					if i, err := strconv.Atoi(s[len(s)-1]); err == nil {
+						status = i
+					}
+				} else {
+					log.Print(err)
+				}
+
+				os.Exit(status)
+			} else {
+				return err
+			}
+		}
+
+		if once {
+			break
+		}
+
+		// Wait until next time we should run the task.
+		nextTime := cronexpr.MustParse(t.Interval).Next(time.Now())
+		time.Sleep(time.Until(nextTime))
+	}
 
 	return nil
 }
@@ -107,7 +191,7 @@ func (r *Runner) execAll(t *task.Task) <-chan error {
 	done := make(chan error)
 
 	g.Go(func() error {
-		return r.exec(t)
+		return r.execInterval(t)
 	})
 
 	go func() {
@@ -119,6 +203,10 @@ func (r *Runner) execAll(t *task.Task) <-chan error {
 }
 
 func (r *Runner) prepareTask(t *task.Task) *task.Task {
+	if t.Variables == nil {
+		t.Variables = make(map[string]string)
+	}
+
 	// Merge global variables with task variables.
 	for k, v := range r.Config.Variables {
 		t.Variables[k] = v
@@ -198,50 +286,4 @@ func (r *Runner) Task(name string) *task.Task {
 	}
 
 	return nil
-}
-
-// Run runs a task.
-func (r *Runner) Run(id string) error {
-	task := r.Task(id)
-
-	if task == nil {
-		return fmt.Errorf("task missing: %s", id)
-	}
-
-	done := make(chan bool, 1)
-
-	task.SetID(id)
-
-	defer func() {
-		r.engine.Destroy(task)
-	}()
-
-	if err := r.engine.Setup(task); err != nil {
-		return err
-	}
-
-	var e error
-
-	select {
-	case <-r.ctx.Done():
-		close(done)
-		return errors.New("context is done")
-	case err := <-r.execAll(task):
-		if err != nil {
-			e = err
-		}
-		done <- true
-	}
-
-	// Wait for task to be done.
-	for {
-		if len(done) == 1 {
-			close(done)
-			break
-		}
-
-		time.Sleep(1 * time.Second)
-	}
-
-	return e
 }

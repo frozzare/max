@@ -18,7 +18,6 @@ import (
 
 type engine struct {
 	client  client.APIClient
-	ctx     context.Context
 	volumes []Volume
 }
 
@@ -31,7 +30,6 @@ func New() (backend.Engine, error) {
 
 	return &engine{
 		client: client,
-		ctx:    context.Background(),
 		volumes: []Volume{
 			{
 				Name:   "max_default",
@@ -42,9 +40,9 @@ func New() (backend.Engine, error) {
 }
 
 // Setup setups the docker engine.
-func (e *engine) Setup(task *task.Task) error {
+func (e *engine) Setup(ctx context.Context, task *task.Task) error {
 	for _, vol := range e.volumes {
-		_, err := e.client.VolumeCreate(e.ctx, volume.VolumesCreateBody{
+		_, err := e.client.VolumeCreate(ctx, volume.VolumesCreateBody{
 			Name:       vol.Name,
 			Driver:     vol.Driver,
 			DriverOpts: vol.DriverOpts,
@@ -58,10 +56,10 @@ func (e *engine) Setup(task *task.Task) error {
 }
 
 // Exec execute a task in a docker container.
-func (e *engine) Exec(t *task.Task) error {
+func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 	pullopts := types.ImagePullOptions{}
 
-	rc, perr := e.client.ImagePull(e.ctx, t.Docker.Image, pullopts)
+	rc, perr := e.client.ImagePull(ctx, t.Docker.Image, pullopts)
 	if perr == nil {
 		io.Copy(ioutil.Discard, rc)
 		rc.Close()
@@ -92,18 +90,18 @@ func (e *engine) Exec(t *task.Task) error {
 		Binds: t.Docker.Volumes,
 	}
 
-	_, err := e.client.ContainerCreate(e.ctx, config, hostConfig, nil, t.ID())
+	_, err := e.client.ContainerCreate(ctx, config, hostConfig, nil, t.ID())
 
 	if err != nil {
 		return err
 	}
 
-	return e.client.ContainerStart(e.ctx, t.ID(), types.ContainerStartOptions{})
+	return e.client.ContainerStart(ctx, t.ID(), types.ContainerStartOptions{})
 }
 
 // Logs return docker logs.
-func (e *engine) Logs(task *task.Task) (io.ReadCloser, error) {
-	logs, err := e.client.ContainerLogs(e.ctx, task.ID(), types.ContainerLogsOptions{
+func (e *engine) Logs(ctx context.Context, task *task.Task) (io.ReadCloser, error) {
+	logs, err := e.client.ContainerLogs(ctx, task.ID(), types.ContainerLogsOptions{
 		Follow:     true,
 		ShowStdout: true,
 		ShowStderr: true,
@@ -128,29 +126,29 @@ func (e *engine) Logs(task *task.Task) (io.ReadCloser, error) {
 }
 
 // Destroy destroys the docker container.
-func (e *engine) Destroy(t *task.Task) error {
-	e.client.ContainerKill(e.ctx, t.ID(), "9")
-	e.client.ContainerRemove(e.ctx, t.ID(), types.ContainerRemoveOptions{
+func (e *engine) Destroy(ctx context.Context, t *task.Task) error {
+	e.client.ContainerKill(ctx, t.ID(), "9")
+	e.client.ContainerRemove(ctx, t.ID(), types.ContainerRemoveOptions{
 		RemoveVolumes: true,
 		RemoveLinks:   false,
 		Force:         false,
 	})
 
 	for _, volume := range e.volumes {
-		e.client.VolumeRemove(e.ctx, volume.Name, true)
+		e.client.VolumeRemove(ctx, volume.Name, true)
 	}
 
 	return nil
 }
 
 // Wait check if the conatiner is done or not.
-func (e *engine) Wait(t *task.Task) (bool, error) {
-	_, err := e.client.ContainerWait(e.ctx, t.ID())
+func (e *engine) Wait(ctx context.Context, t *task.Task) (bool, error) {
+	_, err := e.client.ContainerWait(ctx, t.ID())
 	if err != nil {
 		return false, err
 	}
 
-	info, err := e.client.ContainerInspect(e.ctx, t.ID())
+	info, err := e.client.ContainerInspect(ctx, t.ID())
 	if err != nil {
 		return false, err
 	}

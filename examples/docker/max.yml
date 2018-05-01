@@ -21,3 +21,9 @@ tasks:
     tasks:
       - hello
       - hello2
+  hellocron:
+    docker:
+      image: ubuntu:latest
+    interval: "* * * * * *"
+    commands:
+      - echo Hello, world!
