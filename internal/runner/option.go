@@ -1,6 +1,8 @@
 package runner
 
 import (
+	"log"
+
 	"github.com/frozzare/max/internal/backend"
 	"github.com/frozzare/max/internal/config"
 )
@@ -11,7 +13,7 @@ type Option func(*Runner)
 // Config returns an option configured with a config value.
 func Config(config *config.Config) Option {
 	return func(r *Runner) {
-		r.Config = config
+		r.config = config
 	}
 }
 
@@ -22,16 +24,23 @@ func Engine(engine backend.Engine) Option {
 	}
 }
 
+// Log returns an option configured with a log value.
+func Log(log *log.Logger) Option {
+	return func(r *Runner) {
+		r.log = log
+	}
+}
+
 // Once returns an option configured with a once value.
 func Once(once bool) Option {
 	return func(r *Runner) {
-		r.Once = once
+		r.once = once
 	}
 }
 
 // Verbose returns an option configured with a verbose value.
 func Verbose(verbose bool) Option {
 	return func(r *Runner) {
-		r.Verbose = verbose
+		r.verbose = verbose
 	}
 }

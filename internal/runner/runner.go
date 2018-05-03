@@ -28,13 +28,14 @@ type Runner struct {
 	args    map[string]interface{}
 	ctx     context.Context
 	engine  backend.Engine
-	Config  *config.Config
-	Once    bool
+	config  *config.Config
+	log     *log.Logger
+	once    bool
 	opts    []Option
 	Stdin   io.Reader
 	Stdout  io.Writer
 	Stderr  io.Writer
-	Verbose bool
+	verbose bool
 }
 
 // New creates a new runner.
@@ -51,23 +52,27 @@ func New(opts ...Option) *Runner {
 		opts(r)
 	}
 
+	if r.log == nil {
+		r.log = log.New(os.Stderr, "", log.LstdFlags)
+	}
+
 	return r
 }
 
 // Run runs a task.
 func (r *Runner) Run(id string) error {
-	task := r.Task(id)
+	t := r.Task(id)
 
-	if task == nil {
+	if t == nil {
 		return fmt.Errorf("task missing: %s", id)
 	}
 
-	task.SetID(id)
+	t.ID(id)
 
 	var e error
 
 	select {
-	case err := <-r.execAll(task):
+	case err := <-r.execAll(t):
 		if err != nil {
 			e = err
 		}
@@ -96,8 +101,8 @@ func (r *Runner) exec(t *task.Task) error {
 		r.engine = local.New(backendConfig)
 	}
 
-	if r.Verbose {
-		log.Printf("max: using %s engine\n", r.engine.Name())
+	if r.verbose {
+		r.log.Printf("max: using %s engine\n", r.engine.Name())
 	}
 
 	defer func() {
@@ -164,7 +169,7 @@ func (r *Runner) exec(t *task.Task) error {
 }
 
 func (r *Runner) execInterval(t *task.Task) error {
-	once := len(t.Interval) == 0 || r.Once
+	once := len(t.Interval) == 0 || r.once
 
 	for {
 		select {
@@ -228,13 +233,13 @@ func (r *Runner) prepareTask(t *task.Task) *task.Task {
 	}
 
 	// Merge global variables with task variables.
-	for k, v := range r.Config.Variables {
+	for k, v := range r.config.Variables {
 		t.Variables[k] = v
 	}
 
-	t.Verbose = r.Verbose
+	t.Verbose = r.verbose
 
-	r.args = r.Config.Args
+	r.args = r.config.Args
 	r.parseArgs()
 
 	if t.Args == nil {
@@ -246,6 +251,8 @@ func (r *Runner) prepareTask(t *task.Task) *task.Task {
 			t.Args[k] = v
 		}
 	}
+
+	t.Options(task.Log(r.log))
 
 	return t
 }
@@ -295,12 +302,12 @@ func (r *Runner) parseArgs() {
 
 // Task returns a task by name if it exists.
 func (r *Runner) Task(name string) *task.Task {
-	if r.Config == nil || r.Config.Tasks[name] == nil {
+	if r.config == nil || r.config.Tasks[name] == nil {
 		return nil
 	}
 
 	for _, n := range []string{fmt.Sprintf("%s_%s", name, runtime.GOOS), name} {
-		if t := r.Config.Tasks[n]; t != nil {
+		if t := r.config.Tasks[n]; t != nil {
 			return t
 		}
 	}

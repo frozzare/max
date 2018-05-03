@@ -15,33 +15,41 @@ type Task struct {
 	Deps      []string
 	Dir       string
 	Docker    *config.Docker
-	id        string
 	Interval  string
 	Summary   string
 	Tasks     yamllist.List
 	Usage     string
 	Variables map[string]string
-	Verbose   bool
+
+	id      string
+	log     *log.Logger
+	Verbose bool
 }
 
 // ID returns the task id.
-func (t *Task) ID() string {
+func (t *Task) ID(id ...string) string {
+	if len(id) > 0 {
+		t.id = id[0]
+	}
+
 	return t.id
 }
 
-// SetID sets the task id.
-func (t *Task) SetID(id string) {
-	t.id = id
+// Options sets task options.
+func (t *Task) Options(opts ...Option) {
+	for _, opts := range opts {
+		opts(t)
+	}
 }
 
 // PrintUsage print usage of task.
 func (t *Task) PrintUsage(id string) {
 	if len(t.Usage) != 0 {
-		log.Printf("Usage:\n  max %s %s\n", id, t.Usage)
+		t.log.Printf("Usage:\n  max %s %s\n", id, t.Usage)
 	}
 
 	if len(t.Summary) != 0 {
-		log.Printf("Summary:\n  %s", t.Summary)
+		t.log.Printf("Summary:\n  %s", t.Summary)
 	}
 }
 
