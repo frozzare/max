@@ -1,10 +1,12 @@
 package task
 
 import (
+	"context"
 	"log"
 	"strings"
 
 	"github.com/frozzare/max/internal/backend/config"
+	"github.com/frozzare/max/pkg/exec"
 	"github.com/frozzare/max/pkg/yamllist"
 )
 
@@ -17,6 +19,7 @@ type Task struct {
 	Docker    *config.Docker
 	Interval  string
 	Summary   string
+	Status    yamllist.List
 	Tasks     yamllist.List
 	Usage     string
 	Variables map[string]string
@@ -64,16 +67,56 @@ func (t *Task) Prepare() error {
 	// Trim spaces if any exists.
 	t.Dir = strings.TrimSpace(d)
 
-	for i, c := range t.Commands.Values {
-		c, err := t.prepareString(c)
-		if err != nil {
-			return err
-		}
-
-		t.Commands.Values[i] = c
+	// Prepare status commands.
+	cmds, err := t.prepareSlice(t.Status.Values)
+	if err != nil {
+		return err
 	}
+	t.Status.Values = cmds
+
+	// Prepare command values.
+	cmds, err = t.prepareSlice(t.Commands.Values)
+	if err != nil {
+		return err
+	}
+	t.Commands.Values = cmds
 
 	return nil
+}
+
+// UpToDate determine if a task is up to date using status commands.
+func (t *Task) UpToDate(ctx context.Context) bool {
+	if len(t.Status.Values) == 0 {
+		return false
+	}
+
+	for _, c := range t.Status.Values {
+		opts := &exec.Options{
+			Context: ctx,
+			Dir:     t.Dir,
+			Env:     toEnv(t.Variables),
+			Command: c,
+		}
+
+		if err := exec.Exec(opts); err != nil {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (t *Task) prepareSlice(s []string) ([]string, error) {
+	for i, c := range s {
+		c, err := t.prepareString(c)
+		if err != nil {
+			return []string{}, err
+		}
+
+		s[i] = c
+	}
+
+	return s, nil
 }
 
 func (t *Task) prepareString(c string) (string, error) {

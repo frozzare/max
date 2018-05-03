@@ -1,6 +1,7 @@
 package exec
 
 import (
+	"context"
 	"io"
 	"os"
 	"strings"
@@ -11,6 +12,7 @@ import (
 
 // Options represents execute options.
 type Options struct {
+	Context context.Context
 	Dir     string
 	Env     []string
 	Command string
@@ -47,13 +49,14 @@ func Exec(opts *Options) error {
 	}
 
 	r := interp.Runner{
-		Env:    env,
-		Dir:    path,
-		Exec:   interp.DefaultExec,
-		Open:   interp.OpenDevImpls(interp.DefaultOpen),
-		Stdin:  opts.Stdin,
-		Stdout: opts.Stdout,
-		Stderr: opts.Stderr,
+		Context: opts.Context,
+		Env:     env,
+		Dir:     path,
+		Exec:    interp.DefaultExec,
+		Open:    interp.OpenDevImpls(interp.DefaultOpen),
+		Stdin:   opts.Stdin,
+		Stdout:  opts.Stdout,
+		Stderr:  opts.Stderr,
 	}
 
 	if err = r.Reset(); err != nil {

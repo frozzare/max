@@ -82,6 +82,10 @@ func (r *Runner) Run(id string) error {
 }
 
 func (r *Runner) exec(t *task.Task) error {
+	if t.UpToDate(r.ctx) {
+		return errors.New("task is up to date")
+	}
+
 	backendConfig := &backendConfig.Backend{
 		Stdin:  r.Stdin,
 		Stdout: r.Stdout,

@@ -38,6 +38,7 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 		}
 
 		opts := &exec.Options{
+			Context: ctx,
 			Dir:     t.Dir,
 			Env:     toEnv(t.Variables),
 			Command: c,
