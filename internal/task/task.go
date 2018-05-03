@@ -46,17 +46,26 @@ func (t *Task) PrintUsage(id string) {
 }
 
 // Prepare prepares the command and directory.
-func (t *Task) Prepare(c string) (string, error) {
+func (t *Task) Prepare() error {
 	// Support usage of environment variabels and arguments in directory field.
 	d, err := t.prepareString(t.Dir)
 	if err != nil {
-		return "", err
+		return err
 	}
 
 	// Trim spaces if any exists.
 	t.Dir = strings.TrimSpace(d)
 
-	return t.prepareString(c)
+	for i, c := range t.Commands.Values {
+		c, err := t.prepareString(c)
+		if err != nil {
+			return err
+		}
+
+		t.Commands.Values[i] = c
+	}
+
+	return nil
 }
 
 func (t *Task) prepareString(c string) (string, error) {

@@ -124,6 +124,11 @@ func (r *Runner) exec(t *task.Task) error {
 		}
 	}
 
+	// Prepare tasks, e.g replace arguments and environment variables.
+	if err := t.Prepare(); err != nil {
+		return err
+	}
+
 	// Execute task in engine.
 	if err := r.engine.Exec(r.ctx, t); err != nil {
 		return err

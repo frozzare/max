@@ -77,17 +77,6 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 		}
 	}
 
-	var cmds []string
-
-	for _, c := range t.Commands.Values {
-		c, err := t.Prepare(c)
-		if err != nil {
-			return err
-		}
-
-		cmds = append(cmds, c)
-	}
-
 	config := &container.Config{
 		AttachStdout: true,
 		AttachStderr: true,
@@ -95,7 +84,7 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 		Volumes:      toVolumes(t.Docker.Volumes),
 		WorkingDir:   t.Docker.Context,
 		Image:        t.Docker.Image,
-		Cmd:          append([]string{"sh", "-c"}, cmds...),
+		Cmd:          append([]string{"sh", "-c"}, t.Commands.Values...),
 		Entrypoint:   strings.Split(t.Docker.Entrypoint, " "),
 	}
 

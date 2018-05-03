@@ -33,11 +33,6 @@ func (e *engine) Setup(ctx context.Context, t *task.Task) error {
 // Exec executes a task.
 func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 	for _, c := range t.Commands.Values {
-		c, err := t.Prepare(c)
-		if err != nil {
-			return err
-		}
-
 		if t.Verbose {
 			log.Print(c)
 		}
