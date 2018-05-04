@@ -1,9 +1,13 @@
 package config
 
-import "io"
+import (
+	"io"
+	"log"
+)
 
 // Backend represents backend configuration.
 type Backend struct {
+	Log    *log.Logger
 	Stdin  io.Reader
 	Stdout io.Writer
 	Stderr io.Writer

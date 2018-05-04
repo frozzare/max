@@ -87,6 +87,7 @@ func (r *Runner) exec(t *task.Task) error {
 	}
 
 	backendConfig := &backendConfig.Backend{
+		Log:    r.log,
 		Stdin:  r.Stdin,
 		Stdout: r.Stdout,
 		Stderr: r.Stderr,
