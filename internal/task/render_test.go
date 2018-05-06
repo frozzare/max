@@ -27,7 +27,7 @@ func TestRenderEnvVariables(t *testing.T) {
 
 	env.Set("NAME", "")
 
-	c = renderEnvVariables("echo HELLO $1", map[string]string{
+	c = renderEnvVariables("echo Hello $1", map[string]string{
 		"1": "Fredrik3",
 	})
 
