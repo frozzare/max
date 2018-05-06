@@ -10,7 +10,7 @@ import (
 )
 
 func renderEnvVariables(v string, variables map[string]string) string {
-	r := regexp.MustCompile(`\$[a-zA-Z_]+[a-zA-Z0-9_]*`)
+	r := regexp.MustCompile(`\$[a-zA-Z0-9_]+[a-zA-Z0-9_]*`)
 	m := r.FindAllString(v, -1)
 
 	for _, e := range m {

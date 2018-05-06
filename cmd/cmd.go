@@ -60,7 +60,7 @@ func Execute() {
 
 	// Find task and arguments to run.
 	task, args := getTaskWithArgs()
-	fmt.Println(task, args)
+
 	// Run built in commands.
 	if runCommands(task, args) {
 		return

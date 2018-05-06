@@ -26,6 +26,14 @@ func TestRenderEnvVariables(t *testing.T) {
 	}
 
 	env.Set("NAME", "")
+
+	c = renderEnvVariables("echo HELLO $1", map[string]string{
+		"1": "Fredrik3",
+	})
+
+	if c != "echo Hello Fredrik3" {
+		t.Fatal("Expected command to be 'echo Hello Fredrik3'")
+	}
 }
 
 func TestRenderCommand(t *testing.T) {

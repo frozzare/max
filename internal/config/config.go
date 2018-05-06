@@ -65,6 +65,10 @@ func (c *Config) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		c.Variables = b.Variables
 		c.Version = b.Version
 
+		if c.Variables == nil {
+			c.Variables = make(map[string]string)
+		}
+
 		// Loop over tasks to include and convert existing maps to tasks.
 		for k, v := range b.Tasks {
 			switch r := v.(type) {

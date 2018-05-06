@@ -233,6 +233,8 @@ func (r *Runner) execAll(t *task.Task) <-chan error {
 }
 
 func (r *Runner) prepareTask(t *task.Task) *task.Task {
+	r.parseArgs()
+
 	if t.Variables == nil {
 		t.Variables = make(map[string]string)
 	}
@@ -245,7 +247,6 @@ func (r *Runner) prepareTask(t *task.Task) *task.Task {
 	t.Verbose = r.verbose
 
 	r.args = r.config.Args
-	r.parseArgs()
 
 	if t.Args == nil {
 		t.Args = make(map[string]interface{})
@@ -277,6 +278,8 @@ func (r *Runner) parseArgs() {
 		r.args = make(map[string]interface{})
 	}
 
+	i := 0
+
 	for {
 		rn, _, err := buff.ReadRune()
 
@@ -301,6 +304,9 @@ func (r *Runner) parseArgs() {
 					r.args[key] = val
 				}
 			}
+		} else if val, err := buff.ReadString(' '); err == nil || err == io.EOF {
+			i++
+			r.config.Variables[fmt.Sprintf("%d", i)] = strings.TrimSpace(string(rn) + val)
 		}
 	}
 }
