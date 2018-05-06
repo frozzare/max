@@ -1,0 +1,17 @@
+tasks:
+  build:
+    docker:
+      context: /src
+      image: swiftdocker/swift
+      volumes:
+        - .:/src
+    commands:
+      - swift build
+  run:
+    docker:
+      context: /src
+      image: swiftdocker/swift
+      volumes:
+        - .:/src
+    commands:
+      - swift run
