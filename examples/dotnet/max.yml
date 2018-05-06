@@ -2,6 +2,9 @@ tasks:
   build:
     commands:
       - dotnet build
+  restore:
+    commands:
+      - dotnet restore
   run:
     commands:
       - dotnet run
