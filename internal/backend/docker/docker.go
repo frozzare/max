@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -50,10 +51,6 @@ func (e *engine) Name() string {
 // Setup setups the docker engine.
 func (e *engine) Setup(ctx context.Context, t *task.Task) error {
 	for _, vol := range e.volumes {
-		if t.Verbose {
-			e.config.Log.Printf("max: creating volume %s\n", vol.Name)
-		}
-
 		_, err := e.client.VolumeCreate(ctx, volume.VolumesCreateBody{
 			Name:       vol.Name,
 			Driver:     vol.Driver,
@@ -71,10 +68,6 @@ func (e *engine) Setup(ctx context.Context, t *task.Task) error {
 func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 	pullopts := types.ImagePullOptions{}
 
-	if t.Verbose {
-		e.config.Log.Printf("max: pulling image %s\n", t.Docker.Image)
-	}
-
 	rc, perr := e.client.ImagePull(ctx, t.Docker.Image, pullopts)
 	if perr == nil {
 		io.Copy(ioutil.Discard, rc)
@@ -87,6 +80,16 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 		}
 	}
 
+	var cmds []string
+
+	for _, c := range t.Commands.Values {
+		if t.Verbose {
+			cmds = append(cmds, fmt.Sprintf("echo $ %s && %s", c, c))
+		} else {
+			cmds = append(cmds, c)
+		}
+	}
+
 	config := &container.Config{
 		AttachStdout: true,
 		AttachStderr: true,
@@ -94,7 +97,7 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 		Volumes:      toVolumes(t.Docker.Volumes),
 		WorkingDir:   t.Docker.Context,
 		Image:        t.Docker.Image,
-		Cmd:          append([]string{"sh", "-c"}, t.Commands.Values...),
+		Cmd:          append([]string{"sh", "-c"}, cmds...),
 		Entrypoint:   strings.Split(t.Docker.Entrypoint, " "),
 	}
 
@@ -106,18 +109,10 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 		Binds: t.Docker.Volumes,
 	}
 
-	if t.Verbose {
-		e.config.Log.Printf("max: creating container %s\n", t.ID())
-	}
-
 	_, err := e.client.ContainerCreate(ctx, config, hostConfig, nil, t.ID())
 
 	if err != nil {
 		return err
-	}
-
-	if t.Verbose {
-		e.config.Log.Printf("max: starting container %s\n", t.ID())
 	}
 
 	return e.client.ContainerStart(ctx, t.ID(), types.ContainerStartOptions{})
@@ -151,10 +146,6 @@ func (e *engine) Logs(ctx context.Context, task *task.Task) (io.ReadCloser, erro
 
 // Destroy destroys the docker container.
 func (e *engine) Destroy(ctx context.Context, t *task.Task) error {
-	if t.Verbose {
-		e.config.Log.Printf("max: destroying container %s\n", t.ID())
-	}
-
 	e.client.ContainerKill(ctx, t.ID(), "9")
 	e.client.ContainerRemove(ctx, t.ID(), types.ContainerRemoveOptions{
 		RemoveVolumes: true,
@@ -163,10 +154,6 @@ func (e *engine) Destroy(ctx context.Context, t *task.Task) error {
 	})
 
 	for _, volume := range e.volumes {
-		if t.Verbose {
-			e.config.Log.Printf("max: remove volume %s container\n", volume.Name)
-		}
-
 		e.client.VolumeRemove(ctx, volume.Name, true)
 	}
 
@@ -178,10 +165,6 @@ func (e *engine) Wait(ctx context.Context, t *task.Task) (bool, error) {
 	_, err := e.client.ContainerWait(ctx, t.ID())
 	if err != nil {
 		return false, err
-	}
-
-	if t.Verbose {
-		e.config.Log.Printf("max: waiting for container %s to be finished\n", t.ID())
 	}
 
 	info, err := e.client.ContainerInspect(ctx, t.ID())

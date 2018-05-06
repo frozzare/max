@@ -13,7 +13,7 @@ tasks:
     commands:
       - echo Hello
   hello2:
-    docker:
+    docker2:
       image: ubuntu:latest
     commands:
       - echo Hello2

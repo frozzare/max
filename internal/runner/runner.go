@@ -53,7 +53,7 @@ func New(opts ...Option) *Runner {
 	}
 
 	if r.log == nil {
-		r.log = log.New(os.Stderr, "", log.LstdFlags)
+		r.log = log.New(os.Stderr, "", 0)
 	}
 
 	return r

@@ -2,6 +2,7 @@ package local
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 
@@ -22,7 +23,7 @@ func New(config *config.Backend) backend.Engine {
 
 // Name returns engine name.
 func (e *engine) Name() string {
-	return "system"
+	return "local"
 }
 
 // Setup setups local engine.
@@ -34,7 +35,7 @@ func (e *engine) Setup(ctx context.Context, t *task.Task) error {
 func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 	for _, c := range t.Commands.Values {
 		if t.Verbose {
-			log.Print(c)
+			log.Print(fmt.Sprintf("$ %s", c))
 		}
 
 		opts := &exec.Options{
