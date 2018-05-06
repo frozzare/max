@@ -1,0 +1,7 @@
+tasks:
+  build:
+    commands:
+      - dotnet build
+  run:
+    commands:
+      - dotnet run
