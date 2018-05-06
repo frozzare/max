@@ -105,6 +105,10 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 		config.Entrypoint = []string{"/bin/sh", "-c"}
 	}
 
+	if len(config.WorkingDir) == 0 {
+		config.WorkingDir = t.Dir
+	}
+
 	hostConfig := &container.HostConfig{
 		Binds: t.Docker.Volumes,
 	}
