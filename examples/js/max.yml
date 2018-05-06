@@ -13,3 +13,10 @@ tasks:
         - .:/src
     commands:
       - npm install
+  run:
+    docker:
+      image: mkenney/npm:alpine
+      volumes:
+        - .:/src
+    commands:
+      - node main.js
