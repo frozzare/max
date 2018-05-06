@@ -1,0 +1,16 @@
+tasks:
+  build:
+    docker:
+      image: mkenney/npm:alpine
+      volumes:
+        - .:/src
+    deps: [install]
+    commands:
+      - ./node_modules/.bin/webpack -p
+  install:
+    docker:
+      image: mkenney/npm:alpine
+      volumes:
+        - .:/src
+    commands:
+      - npm install
