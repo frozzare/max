@@ -54,13 +54,13 @@ func Execute() {
 	pflag.Parse()
 
 	// Bail if help flag.
-	if strings.Contains("-help", os.Args[len(os.Args)-1]) {
+	if strings.Contains(os.Args[len(os.Args)-1], "-help") {
 		return
 	}
 
 	// Find task and arguments to run.
 	task, args := getTaskWithArgs()
-
+	fmt.Println(task, args)
 	// Run built in commands.
 	if runCommands(task, args) {
 		return
