@@ -27,3 +27,13 @@ release:
   github:
     owner: frozzare
     name: max
+brew:
+  github:
+    owner: frozzare
+    name: homebrew-tap
+  homepage: https://github.com/frozzare/max
+  description: Max is a YAML-based task runner
+  test: |
+    system "#{bin}/max version"
+  install: |
+    bin.install "max"
