@@ -246,8 +246,6 @@ func (r *Runner) prepareTask(t *task.Task) *task.Task {
 
 	t.Verbose = r.verbose
 
-	r.args = r.config.Args
-
 	if t.Args == nil {
 		t.Args = make(map[string]interface{})
 	}
@@ -273,6 +271,8 @@ func (r *Runner) parseArgs() {
 	}
 
 	buff := bytes.NewBufferString(input)
+
+	r.args = r.config.Args
 
 	if r.args == nil {
 		r.args = make(map[string]interface{})
