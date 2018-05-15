@@ -301,7 +301,7 @@ func (r *Runner) parseArgs() {
 					key := strings.TrimSpace(arg)
 					key = strings.Replace(key, "-", "_", -1)
 
-					r.args[key] = val
+					r.args[key] = strings.TrimSpace(val)
 				}
 			}
 		} else if val, err := buff.ReadString(' '); err == nil || err == io.EOF {
