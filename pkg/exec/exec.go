@@ -44,10 +44,7 @@ func Exec(opts *Options) error {
 	}
 
 	env := os.Environ()
-	for _, e := range opts.Env {
-		env = append(env, e)
-	}
-
+	env = append(env, opts.Env...)
 	envi, err := interp.EnvFromList(env)
 	if err != nil {
 		return err
