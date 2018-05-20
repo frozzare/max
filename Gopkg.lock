@@ -15,19 +15,44 @@
 
 [[projects]]
   name = "github.com/docker/distribution"
-  packages = ["digest","reference"]
+  packages = [
+    "digest",
+    "reference"
+  ]
   revision = "48294d928ced5dd9b378f7fd7c6f5da3ff3f2c89"
   version = "v2.6.2"
 
 [[projects]]
   name = "github.com/docker/docker"
-  packages = ["api/types","api/types/blkiodev","api/types/container","api/types/events","api/types/filters","api/types/mount","api/types/network","api/types/reference","api/types/registry","api/types/strslice","api/types/swarm","api/types/time","api/types/versions","api/types/volume","client","pkg/stdcopy","pkg/tlsconfig"]
+  packages = [
+    "api/types",
+    "api/types/blkiodev",
+    "api/types/container",
+    "api/types/events",
+    "api/types/filters",
+    "api/types/mount",
+    "api/types/network",
+    "api/types/reference",
+    "api/types/registry",
+    "api/types/strslice",
+    "api/types/swarm",
+    "api/types/time",
+    "api/types/versions",
+    "api/types/volume",
+    "client",
+    "pkg/stdcopy",
+    "pkg/tlsconfig"
+  ]
   revision = "092cba3727bb9b4a2f0e922cd6c0f93ea270e363"
   version = "v1.13.1"
 
 [[projects]]
   name = "github.com/docker/go-connections"
-  packages = ["nat","sockets","tlsconfig"]
+  packages = [
+    "nat",
+    "sockets",
+    "tlsconfig"
+  ]
   revision = "3ede32e2033de7505e6500d6c868c2b9ed9f169d"
   version = "v0.3.0"
 
@@ -40,8 +65,12 @@
 [[projects]]
   branch = "master"
   name = "github.com/frozzare/go"
-  packages = ["cast","env","http2"]
-  revision = "35b1cc1e4b1377809424e62d25f2ff3c2cf29cb4"
+  packages = [
+    "cast",
+    "env",
+    "http2"
+  ]
+  revision = "dc79b623f73a579b1e2f16f490a17f5634ea8cd6"
 
 [[projects]]
   name = "github.com/gorhill/cronexpr"
@@ -51,7 +80,10 @@
 
 [[projects]]
   name = "github.com/joho/godotenv"
-  packages = [".","autoload"]
+  packages = [
+    ".",
+    "autoload"
+  ]
   revision = "a79fa1e548e2c689c241d10173efd51e5d689d5b"
   version = "v1.2.0"
 
@@ -77,13 +109,18 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
-  revision = "db7d12313a59cd5b727192a287195e2cdfa40049"
+  revision = "1a580b3eff7814fc9b40602fd35256c63b50f491"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/net"
-  packages = ["context","context/ctxhttp","internal/socks","proxy"]
-  revision = "5f9ae10d9af5b1c89ae6904293b14b064d4ada23"
+  packages = [
+    "context",
+    "context/ctxhttp",
+    "internal/socks",
+    "proxy"
+  ]
+  revision = "57065200b4b034a1c8ad54ff77069408c2218ae6"
 
 [[projects]]
   branch = "master"
@@ -94,8 +131,11 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
-  packages = ["unix","windows"]
-  revision = "f67ecc163a74fbeea4cb1db0a101dcd07201464a"
+  packages = [
+    "unix",
+    "windows"
+  ]
+  revision = "7c87d13f8e835d2fb3a70a2912c811ed0c1d241b"
 
 [[projects]]
   name = "gopkg.in/yaml.v2"
@@ -105,9 +145,12 @@
 
 [[projects]]
   name = "mvdan.cc/sh"
-  packages = ["interp","syntax"]
-  revision = "406aa91bb579fc3746db9a55cd9194a7e7db6e92"
-  version = "v2.3.0"
+  packages = [
+    "interp",
+    "syntax"
+  ]
+  revision = "128633afd9abdc36754d0c4dbbe9d226d35965a5"
+  version = "v2.4.0"
 
 [solve-meta]
   analyzer-name = "dep"

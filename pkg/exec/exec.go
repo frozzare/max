@@ -48,9 +48,14 @@ func Exec(opts *Options) error {
 		env = append(env, e)
 	}
 
+	envi, err := interp.EnvFromList(env)
+	if err != nil {
+		return err
+	}
+
 	r := interp.Runner{
 		Context: opts.Context,
-		Env:     env,
+		Env:     envi,
 		Dir:     path,
 		Exec:    interp.DefaultExec,
 		Open:    interp.OpenDevImpls(interp.DefaultOpen),
