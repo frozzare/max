@@ -12,6 +12,13 @@ Check out the [examples](https://github.com/frozzare/max/tree/master/examples).
 go get -u github.com/frozzare/max
 ```
 
+or using [homebrew](https://brew.sh/).
+
+```
+brew tap frozzare/tap
+brew install max
+```
+
 ## Usage
 
 Running `max help` will print help output.
