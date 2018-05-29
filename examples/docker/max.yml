@@ -1,7 +1,7 @@
 tasks:
   build:
     docker:
-      context: /go/src/app
+      working_dir: /go/src/app
       image: golang:1.10
       volumes:
         - .:/go/src/app

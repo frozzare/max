@@ -169,6 +169,12 @@ tasks:
     args: Arguments that all tasks can use. Key/Value map that can be used with --key flag.
     deps: [task] # task dependencies, e.g [build, that]
     dir: Custom directory to execute commands in. Default is where the max file is located.
+    docker:
+      entrypoint: docker entrypoint
+      image: docker image
+      volumes:
+        - single/multi-line array of docker volumes
+      working_dir: docker working directory
     interval: task interval (cron format) (not required)
     summary: task summary (not required)
     tasks:
@@ -178,6 +184,9 @@ tasks:
       - single/multi-line array of commands to run (go text template)
       - access environment variables via $NAME
       - (not required)
+    status:
+      - single/multi-line array of commands to run to test that the task is up to date.
+      - (test -e main)
     usage: string of usage text, e.g "[--name]" (not required)
 ```
 

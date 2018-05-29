@@ -1,7 +1,7 @@
 tasks:
   build:
     docker:
-      context: /src
+      working_dir: /src
       image: swiftdocker/swift
       volumes:
         - .:/src
@@ -9,7 +9,7 @@ tasks:
       - swift build
   run:
     docker:
-      context: /src
+      working_dir: /src
       image: swiftdocker/swift
       volumes:
         - .:/src

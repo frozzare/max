@@ -75,8 +75,8 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 	}
 
 	if path, err := os.Getwd(); err == nil {
-		for i, x := range t.Docker.Volumes {
-			t.Docker.Volumes[i] = strings.Replace(x, ".:", path+":", -1)
+		for i, x := range t.Docker.Volumes.Values {
+			t.Docker.Volumes.Values[i] = strings.Replace(x, ".:", path+":", -1)
 		}
 	}
 
@@ -94,8 +94,8 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 		AttachStdout: true,
 		AttachStderr: true,
 		Env:          toEnv(t.Variables),
-		Volumes:      toVolumes(t.Docker.Volumes),
-		WorkingDir:   t.Docker.Context,
+		Volumes:      toVolumes(t.Docker.Volumes.Values),
+		WorkingDir:   t.Docker.WorkingDir,
 		Image:        t.Docker.Image,
 		Cmd:          append([]string{"sh", "-c"}, cmds...),
 		Entrypoint:   strings.Split(t.Docker.Entrypoint, " "),
@@ -110,7 +110,7 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 	}
 
 	hostConfig := &container.HostConfig{
-		Binds: t.Docker.Volumes,
+		Binds: t.Docker.Volumes.Values,
 	}
 
 	_, err := e.client.ContainerCreate(ctx, config, hostConfig, nil, t.ID())
