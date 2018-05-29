@@ -152,6 +152,22 @@ $ max hello --name max
 Hello max
 ```
 
+## Docker
+
+Tasks can be runned in docker images, you need to configure docker for each tasks.
+
+```yaml
+tasks:
+  build:
+    docker:
+      image: golang:1.10
+      volumes:
+        - .:/go/src/app
+      working_dir: /go/src/app
+    commands:
+      - go build -o main
+```
+
 ## Max file spec
 
 The default file name is `max.yml` but you can specific another file by using the `--config` flag.
