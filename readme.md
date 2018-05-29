@@ -2,6 +2,10 @@
 
 Max is a YAML-based task runner.
 
+No tested on windows (yet, pull request?).
+
+Check out the [examples](https://github.com/frozzare/max/tree/master/examples).
+
 ## Installation
 
 ```
