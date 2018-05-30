@@ -1,9 +1,10 @@
 package cmd
 
-import "github.com/spf13/pflag"
+import (
+	"github.com/spf13/pflag"
+)
 
 func getTaskWithArgs() (string, []string) {
-	// Find arguments to run.
 	args := pflag.Args()
 	if len(args) == 0 {
 		return "default", []string{}
