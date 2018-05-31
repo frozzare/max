@@ -106,10 +106,6 @@ func (r *Runner) exec(t *task.Task) error {
 		r.engine = local.New(backendConfig)
 	}
 
-	if r.verbose {
-		r.log.Printf("max: using %s engine\n", r.engine.Name())
-	}
-
 	defer func() {
 		r.engine.Destroy(r.ctx, t)
 	}()
