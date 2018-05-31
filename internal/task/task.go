@@ -3,6 +3,7 @@ package task
 import (
 	"context"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/frozzare/max/internal/backend/config"
@@ -47,12 +48,18 @@ func (t *Task) Options(opts ...Option) {
 
 // PrintUsage print usage of task.
 func (t *Task) PrintUsage(id string) {
+	if t.log == nil {
+		t.log = log.New(os.Stderr, "", 0)
+	}
+
+	t.log.Println()
+
 	if len(t.Usage) != 0 {
-		t.log.Printf("Usage:\n  max %s %s\n", id, t.Usage)
+		t.log.Printf("Usage:\n\n  max %s %s\n\n", id, t.Usage)
 	}
 
 	if len(t.Summary) != 0 {
-		t.log.Printf("Summary:\n  %s", t.Summary)
+		t.log.Printf("Summary:\n\n  %s", t.Summary)
 	}
 }
 

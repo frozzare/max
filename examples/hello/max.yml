@@ -11,12 +11,15 @@ tasks:
       - echo Hello {{ .first_a }} {{ .last }}
     usage: "[--first-a] [--last]"
   default:
+    summary: Default task
     tasks:
       - hello
   hej:
+    summary: Hej task
     commands:
       - echo Hej $NAME
   hellocron:
+    summary: Hellocron task
     interval: "* * * * * *"
     commands:
       - echo Hello, world!
