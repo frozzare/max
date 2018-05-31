@@ -7,6 +7,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"github.com/frozzare/max/internal/config"
 	"github.com/frozzare/max/internal/runner"
 	"github.com/spf13/pflag"
 )
@@ -29,22 +30,16 @@ func Execute() {
 	log.SetFlags(0)
 	log.SetOutput(os.Stderr)
 
-	pflag.Usage = func() {
-		log.Print(usage)
-		pflag.PrintDefaults()
-		log.Println("\nUse \"max help [task]\" for more information about that task.")
-	}
-
 	var (
+		c           *config.Config
 		configFile  string
-		listFlag    bool
+		err         error
 		onceFlag    bool
 		verboseFlag bool
 	)
 
 	pflag.CommandLine = pflag.NewFlagSet(os.Args[0], pflag.ContinueOnError)
 	pflag.StringVarP(&configFile, "config", "c", "", "sets the config file")
-	pflag.BoolVarP(&listFlag, "list", "l", false, "lists tasks with summary description")
 	pflag.BoolVarP(&onceFlag, "once", "o", false, "runs tasks once and ignore interval")
 	pflag.BoolVarP(&verboseFlag, "verbose", "v", false, "verbose mode")
 
@@ -61,26 +56,43 @@ func Execute() {
 	// Find task and arguments to run.
 	task, args := getTaskWithArgs()
 
+	if task == "help" && len(args) == 0 {
+		c, _ = readConfig(configFile)
+	}
+
+	pflag.Usage = func() {
+		log.Print(usage)
+		pflag.PrintDefaults()
+
+		if c != nil {
+			log.Printf("\n%s\n\n", "Tasks:")
+			l := 21
+			w := tabwriter.NewWriter(os.Stdout, 8, 01, 0, '\t', 0)
+			for k, t := range c.Tasks {
+				s := ""
+				for i := 0; i < l-len(k); i++ {
+					s += " "
+				}
+				fmt.Fprintf(w, "  %s:%s%s\n", k, s, t.Summary)
+			}
+			w.Flush()
+		}
+
+		log.Println("\nUse \"max help [task]\" for more information about that task.")
+	}
+
 	// Run built in commands.
 	if runCommands(task, args) {
 		return
 	}
 
 	// Try to read max config file.
-	c, err := readConfig(configFile)
-	if err != nil {
-		log.Printf("max: %s\n", err.Error())
-		return
-	}
-
-	// Output list of tasks.
-	if listFlag {
-		w := tabwriter.NewWriter(os.Stdout, 0, 8, 0, '\t', 0)
-		for k, t := range c.Tasks {
-			fmt.Fprintf(w, "* %s: \t%s\n", k, t.Summary)
+	if c == nil {
+		c, err = readConfig(configFile)
+		if err != nil {
+			log.Printf("max: %s\n", err.Error())
+			return
 		}
-		w.Flush()
-		return
 	}
 
 	// Create a new runner.
