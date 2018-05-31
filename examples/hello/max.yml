@@ -9,7 +9,7 @@ tasks:
     summary: Hello task
     commands:
       - echo Hello {{ .first_a }} {{ .last }}
-    usage: "[--first] [--last]"
+    usage: "[--first-a] [--last]"
   default:
     tasks:
       - hello
