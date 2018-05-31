@@ -15,8 +15,7 @@ go get -u github.com/frozzare/max
 or using [homebrew](https://brew.sh/).
 
 ```
-brew tap frozzare/tap
-brew install max
+brew install frozzare/tap/max
 ```
 
 ## Usage
