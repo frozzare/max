@@ -46,19 +46,9 @@ func Execute() {
 	pflag.CommandLine.ParseErrorsWhitelist = pflag.ParseErrorsWhitelist{
 		UnknownFlags: true,
 	}
-	pflag.Parse()
 
-	// Bail if help flag.
-	if strings.Contains(os.Args[len(os.Args)-1], "-help") {
-		return
-	}
-
-	// Find task and arguments to run.
-	task, args := getTaskWithArgs()
-
-	if task == "help" && len(args) == 0 {
-		c, _ = readConfig(configFile)
-	}
+	// Read config file if it exists.
+	c, _ = readConfig(configFile)
 
 	pflag.Usage = func() {
 		log.Print(usage)
@@ -81,12 +71,22 @@ func Execute() {
 		log.Println("\nUse \"max help [task]\" for more information about that task.")
 	}
 
+	pflag.Parse()
+
+	// Bail if help flag.
+	if strings.Contains(os.Args[len(os.Args)-1], "-help") {
+		return
+	}
+
+	// Find task and arguments to run.
+	task, args := getTaskWithArgs()
+
 	// Run built in commands.
 	if runCommands(task, args) {
 		return
 	}
 
-	// Try to read max config file.
+	// Try to read max config file if nil.
 	if c == nil {
 		c, err = readConfig(configFile)
 		if err != nil {
