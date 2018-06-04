@@ -19,7 +19,7 @@ func TestToEnv(t *testing.T) {
 
 func TestToVolumes(t *testing.T) {
 	vols := toVolumes([]string{"/var/test:/var/test2"})
-	exp := map[string]struct{}{"/var/test2": struct{}{}}
+	exp := map[string]struct{}{"/var/test2": {}}
 
 	if !reflect.DeepEqual(vols, exp) {
 		t.Fatalf("Expected maps to be the same")

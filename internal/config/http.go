@@ -32,6 +32,9 @@ func includeHTTPTask(url string, cache *cache.Cache) (*task.Task, error) {
 	defer res.Body.Close()
 
 	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
 
 	var t *task.Task
 	if err := yaml.Unmarshal(body, &t); err != nil {

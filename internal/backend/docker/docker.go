@@ -164,7 +164,7 @@ func (e *engine) Destroy(ctx context.Context, t *task.Task) error {
 	return nil
 }
 
-// Wait check if the conatiner is done or not.
+// Wait check if the container is done or not.
 func (e *engine) Wait(ctx context.Context, t *task.Task) (bool, error) {
 	_, err := e.client.ContainerWait(ctx, t.ID())
 	if err != nil {

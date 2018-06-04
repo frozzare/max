@@ -16,7 +16,7 @@ func TestRunner(t *testing.T) {
 	runner := New(
 		Config(&config.Config{
 			Tasks: map[string]*task.Task{
-				"hello": &task.Task{
+				"hello": {
 					Summary:  "Hello task",
 					Commands: yamllist.NewList("echo Hello $NAME"),
 				},
