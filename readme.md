@@ -164,7 +164,7 @@ Hello max
 
 ## Docker
 
-Tasks can be runned in docker images, you need to configure docker for each tasks.
+Tasks can be runned in docker images, you need to configure docker for each task.
 
 ```yaml
 tasks:
