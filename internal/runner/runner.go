@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"fmt"
@@ -140,6 +141,18 @@ func (r *Runner) exec(t *task.Task) error {
 		return err
 	}
 
+	// Get logs from engine.
+	go func() {
+		rc, err := r.engine.Logs(r.ctx, t)
+		if rc != nil && err == nil {
+			scanner := bufio.NewScanner(rc)
+			defer rc.Close()
+			for scanner.Scan() {
+				r.log.Println(scanner.Text())
+			}
+		}
+	}()
+
 	for {
 		exited, err := r.engine.Wait(r.ctx, t)
 		if err != nil {
@@ -149,21 +162,8 @@ func (r *Runner) exec(t *task.Task) error {
 		if exited {
 			break
 		}
-	}
 
-	// Get logs from engine.
-	rc, err := r.engine.Logs(r.ctx, t)
-	if err != nil {
-		return err
-	}
-
-	if rc != nil {
-		go func() {
-			buf := new(bytes.Buffer)
-			buf.ReadFrom(rc)
-			log.Print(buf.String())
-			rc.Close()
-		}()
+		time.Sleep(1 * time.Second)
 	}
 
 	return nil

@@ -12,7 +12,6 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
-	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/frozzare/max/internal/backend"
 	"github.com/frozzare/max/internal/backend/config"
 	"github.com/frozzare/max/internal/task"
@@ -97,6 +96,7 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 	cmd := generateCommand(generateScript(cmds))
 
 	config := &container.Config{
+		Tty:          true,
 		AttachStdout: true,
 		AttachStderr: true,
 		Env:          toEnv(t.Variables),
@@ -130,28 +130,13 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 
 // Logs return docker logs.
 func (e *engine) Logs(ctx context.Context, t *task.Task) (io.ReadCloser, error) {
-	logs, err := e.client.ContainerLogs(ctx, e.containerName(t), types.ContainerLogsOptions{
+	return e.client.ContainerLogs(ctx, e.containerName(t), types.ContainerLogsOptions{
 		Follow:     true,
 		ShowStdout: true,
 		ShowStderr: true,
 		Details:    false,
 		Timestamps: false,
 	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	rc, wc := io.Pipe()
-
-	go func() {
-		stdcopy.StdCopy(wc, wc, logs)
-		logs.Close()
-		wc.Close()
-		rc.Close()
-	}()
-
-	return rc, nil
 }
 
 // Destroy destroys the docker container.
@@ -182,9 +167,5 @@ func (e *engine) Wait(ctx context.Context, t *task.Task) (bool, error) {
 		return false, err
 	}
 
-	if info.State.Running {
-		return false, nil
-	}
-
-	return true, nil
+	return !info.State.Running, nil
 }
