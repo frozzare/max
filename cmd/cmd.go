@@ -81,7 +81,7 @@ func Execute() {
 	}
 
 	// Find task and arguments to run.
-	task, args := getTaskWithArgs()
+	task, args := taskWithArgs()
 
 	// Run built in commands.
 	if runCommands(task, args) {
