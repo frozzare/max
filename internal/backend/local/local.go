@@ -8,8 +8,8 @@ import (
 
 	"github.com/frozzare/max/internal/backend"
 	"github.com/frozzare/max/internal/backend/config"
+	"github.com/frozzare/max/internal/exec"
 	"github.com/frozzare/max/internal/task"
-	"github.com/frozzare/max/pkg/exec"
 )
 
 type engine struct {

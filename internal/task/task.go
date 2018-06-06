@@ -8,7 +8,7 @@ import (
 
 	"github.com/frozzare/go/yaml2"
 	"github.com/frozzare/max/internal/backend/config"
-	"github.com/frozzare/max/pkg/exec"
+	"github.com/frozzare/max/internal/exec"
 )
 
 // Task represents a task.
