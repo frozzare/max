@@ -7,6 +7,13 @@ import (
 	"github.com/frozzare/max/pkg/yamllist"
 )
 
+// Auth represents auth configuration.
+type Auth struct {
+	Email    string `yaml:"email"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+}
+
 // Backend represents backend configuration.
 type Backend struct {
 	Log    *log.Logger
@@ -17,6 +24,7 @@ type Backend struct {
 
 // Docker represents docker configuration.
 type Docker struct {
+	Auth       Auth          `yaml:"auth"`
 	WorkingDir string        `yaml:"working_dir"`
 	Entrypoint string        `yaml:"entrypoint"`
 	Image      string        `yaml:"image"`

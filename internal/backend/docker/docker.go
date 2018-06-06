@@ -2,6 +2,8 @@ package docker
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -71,8 +73,17 @@ func (e *engine) Setup(ctx context.Context, t *task.Task) error {
 func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 	pullopts := types.ImagePullOptions{}
 
-	rc, perr := e.client.ImagePull(ctx, t.Docker.Image, pullopts)
-	if perr == nil {
+	// Add authentication credentials if any.
+	if len(t.Docker.Auth.Username) > 0 && len(t.Docker.Auth.Password) > 0 {
+		b, err := json.Marshal(t.Docker.Auth)
+		if err != nil {
+			return err
+		}
+		pullopts.RegistryAuth = base64.URLEncoding.EncodeToString(b)
+	}
+
+	rc, err := e.client.ImagePull(ctx, t.Docker.Image, pullopts)
+	if err == nil {
 		io.Copy(ioutil.Discard, rc)
 		rc.Close()
 	}
@@ -119,7 +130,7 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 		Binds: t.Docker.Volumes.Values,
 	}
 
-	_, err := e.client.ContainerCreate(ctx, config, hostConfig, nil, e.containerName(t))
+	_, err = e.client.ContainerCreate(ctx, config, hostConfig, nil, e.containerName(t))
 
 	if err != nil {
 		return err
