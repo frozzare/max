@@ -119,6 +119,10 @@ func (r *Runner) exec(t *task.Task) error {
 
 	t = r.prepareTask(t)
 
+	if !r.quiet || !t.Quiet {
+		r.log.Printf("Starting task %s\n", color.GreenString(t.ID()))
+	}
+
 	// Run deps before task.
 	for _, id := range t.Deps {
 		if err := New(append(r.opts, Once(true))...).Run(id); err != nil {
@@ -136,10 +140,6 @@ func (r *Runner) exec(t *task.Task) error {
 	// Prepare tasks, e.g replace arguments and environment variables.
 	if err := t.Prepare(); err != nil {
 		return err
-	}
-
-	if !r.quiet || !t.Quiet {
-		r.log.Printf("Starting task %s\n", color.GreenString(t.ID()))
 	}
 
 	// Execute task in engine.
@@ -280,26 +280,43 @@ func (r *Runner) parseArgs() {
 	for {
 		rn, _, err := buff.ReadRune()
 
-		if err != nil {
-			break
-		}
-
-		if buff.Len() == 0 {
+		if err != nil || buff.Len() == 0 {
 			break
 		}
 
 		if rn == '-' {
-			if arg, err := buff.ReadString(' '); err == nil {
-				if val, err := buff.ReadString(' '); err == nil || err == io.EOF {
+			for {
+				arg, err := buff.ReadString(' ')
+				if len(arg) == 0 || err != nil {
+					if err == io.EOF {
+						break
+					}
+
+					continue
+				}
+
+				val, err := buff.ReadString(' ')
+				if len(val) == 0 {
+					continue
+				}
+
+				if val[0] == '-' {
+					arg = val[1:]
+					val, err = buff.ReadString(' ')
+				}
+
+				if arg[0] == '-' {
+					arg = arg[1:]
+
 					if arg[0] == '-' {
 						arg = arg[1:]
 					}
-
-					key := strings.TrimSpace(arg)
-					key = strings.Replace(key, "-", "_", -1)
-
-					r.args[key] = strings.TrimSpace(val)
 				}
+
+				key := strings.TrimSpace(arg)
+				key = strings.Replace(key, "-", "_", -1)
+
+				r.args[key] = strings.TrimSpace(val)
 			}
 		} else if val, err := buff.ReadString(' '); err == nil || err == io.EOF {
 			i++
