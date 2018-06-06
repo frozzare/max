@@ -24,10 +24,8 @@ type Task struct {
 	Usage     string
 	Variables map[string]string
 
-	id      string      `structs:"-"`
-	log     *log.Logger `structs:"-"`
-	quiet   bool        `structs:"-"`
-	verbose bool        `structs:"-"`
+	id  string      `structs:"-"`
+	log *log.Logger `structs:"-"`
 }
 
 // ID returns the task id.

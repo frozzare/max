@@ -27,13 +27,6 @@ func Log(log *log.Logger) Option {
 	}
 }
 
-// Quiet returns an option configured with a quiet value.
-func Quiet(quiet bool) Option {
-	return func(t *Task) {
-		t.quiet = quiet
-	}
-}
-
 // Variables returns an option configured with a variables value.
 func Variables(vars map[string]string) Option {
 	return func(t *Task) {
@@ -44,12 +37,5 @@ func Variables(vars map[string]string) Option {
 		for k, v := range vars {
 			t.Variables[k] = v
 		}
-	}
-}
-
-// Verbose returns an option configured with a verbose value.
-func Verbose(verbose bool) Option {
-	return func(t *Task) {
-		t.verbose = verbose
 	}
 }

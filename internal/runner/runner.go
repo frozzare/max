@@ -238,14 +238,6 @@ func (r *Runner) prepareTask(t *task.Task) *task.Task {
 		task.Variables(r.config.Variables),
 	)
 
-	if r.quiet {
-		t.Options(task.Quiet(r.quiet))
-	}
-
-	if r.verbose {
-		t.Options(task.Verbose(r.verbose))
-	}
-
 	return t
 }
 
