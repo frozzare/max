@@ -72,16 +72,7 @@ func (r *Runner) Run(id string) error {
 
 	t.ID(id)
 
-	var e error
-
-	select {
-	case err := <-r.execAll(t):
-		if err != nil {
-			e = err
-		}
-	}
-
-	return e
+	return <-r.execAll(t)
 }
 
 func (r *Runner) exec(t *task.Task) error {
@@ -187,7 +178,6 @@ func (r *Runner) execInterval(t *task.Task) error {
 		case <-r.ctx.Done():
 			return errors.New("cancelled")
 		default:
-			break
 		}
 
 		if err := r.exec(t); err != nil {
@@ -296,13 +286,16 @@ func (r *Runner) parseArgs() {
 				}
 
 				val, err := buff.ReadString(' ')
-				if len(val) == 0 {
+				if len(val) == 0 || (err != nil && err != io.EOF) {
 					continue
 				}
 
 				if val[0] == '-' {
 					arg = val[1:]
 					val, err = buff.ReadString(' ')
+					if len(val) == 0 || (err != nil && err != io.EOF) {
+						continue
+					}
 				}
 
 				if arg[0] == '-' {
