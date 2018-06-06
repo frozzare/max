@@ -26,16 +26,43 @@ Running `max help` will print help output.
 
 ```
 $ max help [task]
+
 Usage:
+
   max hello [name]
 
 Summary:
+
   Hello task
 ```
 
 ## Configuration
 
 The default task is `default`
+
+Default task can be changed by using `MAX_DEFAULT_TASK` environment variable.
+
+```
+$ MAX_DEFAULT_TASK=custom max
+```
+
+## Task output
+
+Starting and finished logs:
+
+```
+$ max hello
+Starting task hello
+Hello
+Finished task hello
+```
+
+Minimal logs (quiet flag):
+
+```
+$ max hello -q
+Hello
+```
 
 ### Basic task
 
@@ -52,7 +79,7 @@ tasks:
 Output
 
 ```
-$ max hello
+$ max hello -q
 Hello
 ```
 
@@ -74,10 +101,10 @@ tasks:
 Output
 
 ```
-$ max hello
+$ max hello -q
 Hello default
 
-$ max hello --name max
+$ max hello -q --name max
 Hello max
 ```
 
@@ -101,10 +128,10 @@ tasks:
 Output
 
 ```
-$ max
+$ max -q
 Hello default
 
-$ max default --name max
+$ max default -q --name max
 Hello max
 ```
 
@@ -126,10 +153,10 @@ tasks:
 Output
 
 ```
-$ max hello
+$ max hello -q
 Hello default
 
-$ max hello --name max
+$ max hello -q --name max
 Hello max
 ```
 
@@ -155,10 +182,10 @@ commands:
 Output
 
 ```
-$ max hello
+$ max hello -q
 Hello default
 
-$ max hello --name max
+$ max hello -q --name max
 Hello max
 ```
 
@@ -196,6 +223,10 @@ tasks:
     deps: [task] # task dependencies, e.g [build, that]
     dir: Custom directory to execute commands in. Default is where the max file is located.
     docker:
+      auth: # private registry
+        email:
+        username:
+        password:
       entrypoint: docker entrypoint
       image: docker image
       volumes:
