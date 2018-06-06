@@ -2,7 +2,6 @@ package task
 
 import (
 	"bytes"
-	"fmt"
 	"reflect"
 	"regexp"
 	"strings"
@@ -112,18 +111,4 @@ func renderStruct(s interface{}, args map[string]interface{}, vars map[string]st
 	}
 
 	return s, nil
-}
-
-func strct(s interface{}) (reflect.Value, error) {
-	v := reflect.ValueOf(s)
-
-	for v.Kind() == reflect.Ptr {
-		v = v.Elem()
-	}
-
-	if v.Kind() != reflect.Struct {
-		return v, fmt.Errorf("%s is not a struct", v.Kind())
-	}
-
-	return v, nil
 }
