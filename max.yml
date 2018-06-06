@@ -10,5 +10,5 @@ tasks:
   test:
     summary: Run max tests
     commands:
-      - go test ./...
-      - go vet ./...
+      - go test $(go list ./... | grep -v /examples/)
+      - go vet $(go list ./... | grep -v /examples/)
