@@ -4,7 +4,7 @@ import (
 	"io"
 	"log"
 
-	"github.com/frozzare/max/pkg/yamllist"
+	"github.com/frozzare/go/yaml2"
 )
 
 // Auth represents auth configuration.
@@ -24,9 +24,9 @@ type Backend struct {
 
 // Docker represents docker configuration.
 type Docker struct {
-	Auth       Auth          `yaml:"auth"`
-	WorkingDir string        `yaml:"working_dir"`
-	Entrypoint string        `yaml:"entrypoint"`
-	Image      string        `yaml:"image"`
-	Volumes    yamllist.List `yaml:"volumes"`
+	Auth       Auth       `yaml:"auth"`
+	WorkingDir string     `yaml:"working_dir"`
+	Entrypoint string     `yaml:"entrypoint"`
+	Image      string     `yaml:"image"`
+	Volumes    yaml2.List `yaml:"volumes"`
 }

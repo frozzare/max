@@ -6,22 +6,22 @@ import (
 	"os"
 	"strings"
 
+	"github.com/frozzare/go/yaml2"
 	"github.com/frozzare/max/internal/backend/config"
 	"github.com/frozzare/max/pkg/exec"
-	"github.com/frozzare/max/pkg/yamllist"
 )
 
 // Task represents a task.
 type Task struct {
 	Args      map[string]interface{}
-	Commands  yamllist.List
+	Commands  yaml2.List
 	Deps      []string
 	Dir       string
 	Docker    *config.Docker
 	Interval  string
 	Summary   string
-	Status    yamllist.List
-	Tasks     yamllist.List
+	Status    yaml2.List
+	Tasks     yaml2.List
 	Usage     string
 	Variables map[string]string
 

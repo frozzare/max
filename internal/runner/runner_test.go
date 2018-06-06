@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/frozzare/go/yaml2"
 	"github.com/frozzare/max/internal/config"
 	"github.com/frozzare/max/internal/task"
-	"github.com/frozzare/max/pkg/yamllist"
 )
 
 func TestRunner(t *testing.T) {
@@ -18,7 +18,7 @@ func TestRunner(t *testing.T) {
 			Tasks: map[string]*task.Task{
 				"hello": {
 					Summary:  "Hello task",
-					Commands: yamllist.NewList("echo Hello $NAME"),
+					Commands: yaml2.NewList("echo Hello $NAME"),
 				},
 			},
 			Variables: map[string]string{

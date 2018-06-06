@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/frozzare/max/pkg/yamllist"
+	"github.com/frozzare/go/yaml2"
 )
 
 func TestPrepare(t *testing.T) {
@@ -13,8 +13,8 @@ func TestPrepare(t *testing.T) {
 			"name": "Fredrik",
 		},
 		Dir:      "./{{ .name }}",
-		Commands: yamllist.NewList("Hello {{ .name }}"),
-		Status:   yamllist.NewList("Hello {{ .name }}"),
+		Commands: yaml2.NewList("Hello {{ .name }}"),
+		Status:   yaml2.NewList("Hello {{ .name }}"),
 	}
 
 	task.Prepare()
@@ -40,7 +40,7 @@ func TestUpToDate(t *testing.T) {
 	}
 
 	task = &Task{
-		Status: yamllist.NewList("test -z \"\""),
+		Status: yaml2.NewList("test -z \"\""),
 	}
 
 	if !task.UpToDate(context.Background()) {

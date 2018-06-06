@@ -73,7 +73,8 @@
   packages = [
     "cast",
     "env",
-    "http2"
+    "http2",
+    "yaml2"
   ]
   revision = "dc79b623f73a579b1e2f16f490a17f5634ea8cd6"
 
@@ -172,6 +173,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a680e83b408e22aa2be0ab73395346d7f5fb15bd0e48fa19ffd87d90f0e9ee6d"
+  inputs-digest = "214205e99003f46199b0a1ea8f4074577543e322a4c67c0570e4783075011f3d"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -1,6 +1,0 @@
-tasks:
-  list:
-    commands: List item
-  list2:
-    commands:
-      - List item
