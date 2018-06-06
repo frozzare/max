@@ -34,6 +34,7 @@ type Config struct {
 type base struct {
 	Args      map[string]interface{}
 	Tasks     map[string]interface{}
+	Quiet     bool
 	Variables map[string]string
 	Version   string
 }

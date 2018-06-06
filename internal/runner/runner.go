@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/frozzare/max/internal/backend"
 	backendConfig "github.com/frozzare/max/internal/backend/config"
 	"github.com/frozzare/max/internal/backend/docker"
@@ -33,6 +34,7 @@ type Runner struct {
 	log     *log.Logger
 	once    bool
 	opts    []Option
+	quiet   bool
 	Stdin   io.Reader
 	Stdout  io.Writer
 	Stderr  io.Writer
@@ -136,6 +138,10 @@ func (r *Runner) exec(t *task.Task) error {
 		return err
 	}
 
+	if !r.quiet || !t.Quiet {
+		r.log.Printf("Starting task %s\n", color.GreenString(t.ID()))
+	}
+
 	// Execute task in engine.
 	if err := r.engine.Exec(r.ctx, t); err != nil {
 		return err
@@ -164,6 +170,10 @@ func (r *Runner) exec(t *task.Task) error {
 		}
 
 		time.Sleep(1 * time.Second)
+	}
+
+	if !r.quiet || !t.Quiet {
+		r.log.Printf("Finished task %s\n", color.GreenString(t.ID()))
 	}
 
 	return nil
@@ -231,28 +241,19 @@ func (r *Runner) execAll(t *task.Task) <-chan error {
 func (r *Runner) prepareTask(t *task.Task) *task.Task {
 	r.parseArgs()
 
-	if t.Variables == nil {
-		t.Variables = make(map[string]string)
+	t.Options(
+		task.Args(r.args),
+		task.Log(r.log),
+		task.Variables(r.config.Variables),
+	)
+
+	if r.quiet {
+		t.Options(task.Quiet(r.quiet))
 	}
 
-	// Merge global variables with task variables.
-	for k, v := range r.config.Variables {
-		t.Variables[k] = v
+	if r.verbose {
+		t.Options(task.Verbose(r.verbose))
 	}
-
-	t.Verbose = r.verbose
-
-	if t.Args == nil {
-		t.Args = make(map[string]interface{})
-	}
-
-	if len(r.args) > 0 {
-		for k, v := range r.args {
-			t.Args[k] = v
-		}
-	}
-
-	t.Options(task.Log(r.log))
 
 	return t
 }

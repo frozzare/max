@@ -38,6 +38,13 @@ func Once(once bool) Option {
 	}
 }
 
+// Quiet returns an option configured with a quiet value.
+func Quiet(quiet bool) Option {
+	return func(r *Runner) {
+		r.quiet = quiet
+	}
+}
+
 // Verbose returns an option configured with a verbose value.
 func Verbose(verbose bool) Option {
 	return func(r *Runner) {

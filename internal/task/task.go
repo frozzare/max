@@ -27,6 +27,7 @@ type Task struct {
 
 	id      string
 	log     *log.Logger
+	Quiet   bool
 	Verbose bool
 }
 

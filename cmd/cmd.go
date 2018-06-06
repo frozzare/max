@@ -35,13 +35,15 @@ func Execute() {
 		configFile  string
 		err         error
 		onceFlag    bool
+		quietFlag   bool
 		verboseFlag bool
 	)
 
 	pflag.CommandLine = pflag.NewFlagSet(os.Args[0], pflag.ContinueOnError)
 	pflag.StringVarP(&configFile, "config", "c", "", "sets the config file")
 	pflag.BoolVarP(&onceFlag, "once", "o", false, "runs tasks once and ignore interval")
-	pflag.BoolVarP(&verboseFlag, "verbose", "v", false, "verbose mode")
+	pflag.BoolVarP(&quietFlag, "quiet", "q", false, "minimal logs")
+	pflag.BoolVarP(&verboseFlag, "verbose", "v", false, "verbose logs")
 
 	pflag.CommandLine.ParseErrorsWhitelist = pflag.ParseErrorsWhitelist{
 		UnknownFlags: true,
@@ -99,6 +101,7 @@ func Execute() {
 	runner := runner.New(
 		runner.Config(c),
 		runner.Once(onceFlag),
+		runner.Quiet(quietFlag),
 		runner.Verbose(verboseFlag),
 	)
 
