@@ -74,7 +74,7 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 	pullopts := types.ImagePullOptions{}
 
 	// Add authentication credentials if any.
-	if len(t.Docker.Auth.Username) > 0 && len(t.Docker.Auth.Password) > 0 {
+	if t.Docker.Auth != nil && len(t.Docker.Auth.Username) > 0 && len(t.Docker.Auth.Password) > 0 {
 		b, err := json.Marshal(t.Docker.Auth)
 		if err != nil {
 			return err

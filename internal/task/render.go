@@ -2,11 +2,15 @@ package task
 
 import (
 	"bytes"
+	"fmt"
+	"reflect"
 	"regexp"
 	"strings"
 	"text/template"
 
 	"github.com/frozzare/go/env"
+	"github.com/frozzare/go/structs"
+	"github.com/frozzare/go/yaml2"
 )
 
 func renderEnvVariables(v string, variables map[string]string) string {
@@ -42,4 +46,84 @@ func renderCommand(c string, args map[string]interface{}) (string, error) {
 	}
 
 	return buf.String(), nil
+}
+
+func renderStruct(s interface{}, args map[string]interface{}, vars map[string]string) (interface{}, error) {
+	fs, err := structs.Fields(s)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, f := range fs {
+		if f == nil || f.IsZero() {
+			continue
+		}
+
+		skipStruct := false
+
+		switch v := f.Value().(type) {
+		case string:
+			v, err = renderCommand(renderEnvVariables(v, vars), args)
+			if err != nil {
+				return nil, err
+			}
+
+			if err := f.Set(v); err != nil {
+				return nil, err
+			}
+		case yaml2.List:
+			skipStruct = true
+
+			for i, k := range v.Values {
+				k, err = renderCommand(renderEnvVariables(k, vars), args)
+				if err != nil {
+					return nil, err
+				}
+				v.Values[i] = k
+			}
+
+			if err := f.Set(v); err != nil {
+				return nil, err
+			}
+		case []string:
+			for i, k := range v {
+				k, err = renderCommand(renderEnvVariables(k, vars), args)
+				if err != nil {
+					return nil, err
+				}
+				v[i] = k
+			}
+
+			if err := f.Set(v); err != nil {
+				return nil, err
+			}
+		}
+
+		if !skipStruct && (f.Kind() == reflect.Struct || f.Kind() == reflect.Ptr) {
+			v, err := renderStruct(f.Value(), args, vars)
+			if err != nil {
+				return nil, err
+			}
+
+			if err := f.Set(v); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return s, nil
+}
+
+func strct(s interface{}) (reflect.Value, error) {
+	v := reflect.ValueOf(s)
+
+	for v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+
+	if v.Kind() != reflect.Struct {
+		return v, fmt.Errorf("%s is not a struct", v.Kind())
+	}
+
+	return v, nil
 }

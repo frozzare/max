@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/frozzare/go/yaml2"
 	"github.com/frozzare/max/internal/backend/config"
@@ -25,8 +24,8 @@ type Task struct {
 	Usage     string
 	Variables map[string]string
 
-	id      string
-	log     *log.Logger
+	id      string      `structs:"-"`
+	log     *log.Logger `structs:"-"`
 	Quiet   bool
 	Verbose bool
 }
@@ -66,28 +65,12 @@ func (t *Task) PrintUsage(id string) {
 
 // Prepare prepares the command and directory.
 func (t *Task) Prepare() error {
-	// Support usage of environment variabels and arguments in directory field.
-	d, err := t.prepareString(t.Dir)
+	v, err := renderStruct(t, t.Args, t.Variables)
 	if err != nil {
 		return err
 	}
 
-	// Trim spaces if any exists.
-	t.Dir = strings.TrimSpace(d)
-
-	// Prepare status commands.
-	cmds, err := t.prepareSlice(t.Status.Values)
-	if err != nil {
-		return err
-	}
-	t.Status.Values = cmds
-
-	// Prepare command values.
-	cmds, err = t.prepareSlice(t.Commands.Values)
-	if err != nil {
-		return err
-	}
-	t.Commands.Values = cmds
+	t = v.(*Task)
 
 	return nil
 }
@@ -112,21 +95,4 @@ func (t *Task) UpToDate(ctx context.Context) bool {
 	}
 
 	return true
-}
-
-func (t *Task) prepareSlice(s []string) ([]string, error) {
-	for i, c := range s {
-		c, err := t.prepareString(c)
-		if err != nil {
-			return []string{}, err
-		}
-
-		s[i] = c
-	}
-
-	return s, nil
-}
-
-func (t *Task) prepareString(c string) (string, error) {
-	return renderCommand(renderEnvVariables(c, t.Variables), t.Args)
 }

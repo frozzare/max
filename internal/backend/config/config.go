@@ -24,7 +24,7 @@ type Backend struct {
 
 // Docker represents docker configuration.
 type Docker struct {
-	Auth       Auth       `yaml:"auth"`
+	Auth       *Auth      `yaml:"auth"`
 	WorkingDir string     `yaml:"working_dir"`
 	Entrypoint string     `yaml:"entrypoint"`
 	Image      string     `yaml:"image"`
