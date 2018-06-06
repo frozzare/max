@@ -81,10 +81,11 @@ func (r *Runner) exec(t *task.Task) error {
 	}
 
 	backendConfig := &backendConfig.Backend{
-		Log:    r.log,
-		Stdin:  r.Stdin,
-		Stdout: r.Stdout,
-		Stderr: r.Stderr,
+		Log:     r.log,
+		Stdin:   r.Stdin,
+		Stdout:  r.Stdout,
+		Stderr:  r.Stderr,
+		Verbose: r.verbose,
 	}
 
 	// Use docker if docker configuration is not nil.
@@ -110,7 +111,7 @@ func (r *Runner) exec(t *task.Task) error {
 
 	t = r.prepareTask(t)
 
-	if !r.quiet || !t.Quiet {
+	if !r.quiet {
 		r.log.Printf("Starting task %s\n", color.GreenString(t.ID()))
 	}
 
@@ -163,7 +164,7 @@ func (r *Runner) exec(t *task.Task) error {
 		time.Sleep(1 * time.Second)
 	}
 
-	if !r.quiet || !t.Quiet {
+	if !r.quiet {
 		r.log.Printf("Finished task %s\n", color.GreenString(t.ID()))
 	}
 

@@ -34,7 +34,7 @@ func (e *engine) Setup(ctx context.Context, t *task.Task) error {
 // Exec executes a task.
 func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 	for _, c := range t.Commands.Values {
-		if t.Verbose {
+		if e.config.Verbose {
 			log.Print(fmt.Sprintf("$ %s", c))
 		}
 

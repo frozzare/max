@@ -16,10 +16,11 @@ type Auth struct {
 
 // Backend represents backend configuration.
 type Backend struct {
-	Log    *log.Logger
-	Stdin  io.Reader
-	Stdout io.Writer
-	Stderr io.Writer
+	Log     *log.Logger
+	Stdin   io.Reader
+	Stdout  io.Writer
+	Stderr  io.Writer
+	Verbose bool
 }
 
 // Docker represents docker configuration.

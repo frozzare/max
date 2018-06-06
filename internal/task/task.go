@@ -26,8 +26,8 @@ type Task struct {
 
 	id      string      `structs:"-"`
 	log     *log.Logger `structs:"-"`
-	Quiet   bool
-	Verbose bool
+	quiet   bool        `structs:"-"`
+	verbose bool        `structs:"-"`
 }
 
 // ID returns the task id.

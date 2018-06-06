@@ -97,7 +97,7 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 	var cmds []string
 
 	for _, c := range t.Commands.Values {
-		if t.Verbose {
+		if e.config.Verbose {
 			cmds = append(cmds, fmt.Sprintf("echo $ %s && %s", c, c))
 		} else {
 			cmds = append(cmds, c)
