@@ -88,6 +88,10 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 		rc.Close()
 	}
 
+	if err != nil {
+		return err
+	}
+
 	if path, err := os.Getwd(); err == nil {
 		for i, x := range t.Docker.Volumes.Values {
 			t.Docker.Volumes.Values[i] = strings.Replace(x, ".:", path+":", -1)
