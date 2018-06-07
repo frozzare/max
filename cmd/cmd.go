@@ -119,12 +119,8 @@ func Execute() {
 		return
 	}
 
-	tasks := append([]string{task}, args...)
-
-	for _, task := range tasks {
-		// Run and log error.
-		if err := runner.Run(task); err != nil {
-			log.Fatalf("max: %s", err.Error())
-		}
+	// Run and log error.
+	if err := runner.Run(task); err != nil {
+		log.Fatalf("max: %s", err.Error())
 	}
 }

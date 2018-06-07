@@ -18,6 +18,10 @@ tasks:
     summary: Hej task
     commands:
       - echo Hej $NAME
+  hej2:
+    summary: Hej2 task
+    commands:
+      - echo Hej $1
   hellocron:
     summary: Hellocron task
     interval: "* * * * * *"
