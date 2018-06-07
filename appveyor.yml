@@ -20,4 +20,4 @@ deploy: false
 
 test_script:
   - go build -o max github.com/frozzare/max
-  - ./max test
+  - max test
