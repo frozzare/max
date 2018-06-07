@@ -2,8 +2,6 @@
 
 Max is a YAML-based task runner.
 
-Not tested on windows (yet, pull request?).
-
 Check out the [examples](https://github.com/frozzare/max/tree/master/examples).
 
 ## Installation
@@ -192,6 +190,8 @@ Hello max
 ## Docker
 
 Tasks can be runned in docker images, you need to configure docker for each task.
+
+Not tested with windows containers (yet, pull request?).
 
 ```yaml
 tasks:
