@@ -309,6 +309,8 @@ func (r *Runner) parseArgs() {
 			r.config.Variables[fmt.Sprintf("%d", i)] = strings.TrimSpace(string(rn) + val)
 		}
 	}
+
+	r.config.Variables["@"] = strings.TrimSpace(input)
 }
 
 // Task returns a task by name if it exists.

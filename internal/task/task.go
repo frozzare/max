@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/frozzare/go/yaml2"
 	"github.com/frozzare/max/internal/backend/config"
@@ -69,6 +70,11 @@ func (t *Task) Prepare() error {
 	}
 
 	t = v.(*Task)
+
+	// Replace special stuff in commands manually.
+	for i, c := range t.Commands.Values {
+		t.Commands.Values[i] = strings.Replace(c, "$@", t.Variables["@"], -1)
+	}
 
 	return nil
 }
