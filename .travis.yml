@@ -1,7 +1,7 @@
 language: go
 go:
-  - "1.9"
   - "1.10"
+  - "1.11"
   - "tip"
 
 before_script:
@@ -9,3 +9,8 @@ before_script:
 
 script:
   - ./max test
+
+os:
+  - windows
+  - linux
+  - osx
