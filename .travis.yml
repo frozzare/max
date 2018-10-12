@@ -1,8 +1,4 @@
 language: go
-go:
-  - "1.10"
-  - "1.11"
-  - "tip"
 
 before_script:
   - go build -o max
@@ -10,7 +6,15 @@ before_script:
 script:
   - ./max test
 
-os:
-  - windows
-  - linux
-  - osx
+matrix:
+  include:
+  - os: windows
+    go: "1.11"
+  - os: osx
+    go: "1.11"
+  - os: linux
+    go: "1.11"
+  - os: osx
+    go: tip
+  - os: linux
+    go: tip
