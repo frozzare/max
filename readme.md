@@ -1,4 +1,4 @@
-# max [![Build Status](https://travis-ci.org/frozzare/max.svg?branch=master)](https://travis-ci.org/frozzare/max) [![Build status](https://ci.appveyor.com/api/projects/status/2m3n5qwam5vv1xvf?svg=true)](https://ci.appveyor.com/project/frozzare/max) [![GoDoc](https://godoc.org/github.com/frozzare/max?status.svg)](http://godoc.org/github.com/frozzare/max) [![Go Report Card](https://goreportcard.com/badge/github.com/frozzare/max)](https://goreportcard.com/report/github.com/frozzare/max)
+# max [![Build Status](https://travis-ci.org/frozzare/max.svg?branch=master)](https://travis-ci.org/frozzare/max) [![GoDoc](https://godoc.org/github.com/frozzare/max?status.svg)](http://godoc.org/github.com/frozzare/max) [![Go Report Card](https://goreportcard.com/badge/github.com/frozzare/max)](https://goreportcard.com/report/github.com/frozzare/max)
 
 Max is a YAML-based task runner with Docker support.
 
