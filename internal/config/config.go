@@ -129,31 +129,30 @@ func ReadFile(args ...string) (*Config, error) {
 	var err error
 
 	if len(args) > 0 && args[0] != "" {
-		if _, err := os.Stat(args[0]); err == nil {
-			file = args[0]
-			path = filepath.Dir(file)
-		} else {
-			path = args[0]
-		}
-	}
-
-	if !strings.HasPrefix("/", path) {
-		path, err = os.Getwd()
-	}
-
-	files := []string{fmt.Sprintf("max_%s.yml", runtime.GOOS), "max.yml"}
-	if len(file) > 0 {
-		files = append([]string{file}, files...)
+		path = args[0]
 	}
 
 	var dat []byte
-	for _, name := range files {
-		if len(dat) > 0 {
-			break
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		path, err = os.Getwd()
+
+		files := []string{fmt.Sprintf("max_%s.yml", runtime.GOOS), "max.yml"}
+		if len(file) > 0 {
+			files = append([]string{file}, files...)
 		}
 
-		file := filepath.Join(path, name)
-		dat, err = ioutil.ReadFile(file)
+		var dat []byte
+		for _, name := range files {
+			if len(dat) > 0 {
+				break
+			}
+
+			file := filepath.Join(path, name)
+			dat, err = ioutil.ReadFile(file)
+		}
+	} else {
+		dat, err = ioutil.ReadFile(path)
 	}
 
 	if err != nil {

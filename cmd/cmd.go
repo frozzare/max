@@ -44,13 +44,18 @@ func Execute() {
 	pflag.BoolVarP(&onceFlag, "once", "o", false, "runs tasks once and ignore interval")
 	pflag.BoolVarP(&quietFlag, "quiet", "q", false, "minimal logs")
 	pflag.BoolVarP(&verboseFlag, "verbose", "v", false, "verbose logs")
+	pflag.Parse()
 
 	pflag.CommandLine.ParseErrorsWhitelist = pflag.ParseErrorsWhitelist{
 		UnknownFlags: true,
 	}
 
 	// Read config file if it exists.
-	c, _ = readConfig(configFile)
+	c, err = readConfig(configFile)
+	if err != nil {
+		log.Printf("max: %s\n", err.Error())
+		return
+	}
 
 	pflag.Usage = func() {
 		log.Print(usage)
@@ -72,8 +77,6 @@ func Execute() {
 
 		log.Println("\nUse \"max help [task]\" for more information about that task.")
 	}
-
-	pflag.Parse()
 
 	// Bail if help flag.
 	if strings.Contains(os.Args[len(os.Args)-1], "-help") {
