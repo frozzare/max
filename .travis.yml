@@ -15,6 +15,6 @@ matrix:
   - os: linux
     go: "1.11"
   - os: osx
-    go: tip
+    go: master
   - os: linux
-    go: tip
+    go: master
