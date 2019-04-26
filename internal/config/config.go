@@ -142,15 +142,22 @@ func ReadFile(args ...string) (*Config, error) {
 			files = append([]string{file}, files...)
 		}
 
-		var dat []byte
 		for _, name := range files {
 			if len(dat) > 0 {
 				break
 			}
 
 			file := filepath.Join(path, name)
-			dat, err = ioutil.ReadFile(file)
+
+			if _, err := os.Stat(file); err == nil {
+				dat, err = ioutil.ReadFile(file)
+
+				if err == nil {
+					break
+				}
+			}
 		}
+
 	} else {
 		dat, err = ioutil.ReadFile(path)
 	}
