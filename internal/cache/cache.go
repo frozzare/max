@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/coreos/bbolt"
+	"go.etcd.io/bbolt"
 )
 
 const (
