@@ -1,12 +1,12 @@
 package config
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
 func TestReadContent(t *testing.T) {
-	buf, err := ioutil.ReadFile("./config.yml")
+	buf, err := os.ReadFile("./config.yml")
 
 	if err != nil {
 		t.Errorf("Expected: nil, got: %v", err)

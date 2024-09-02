@@ -3,7 +3,6 @@ package config
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -81,7 +80,7 @@ func (c *Config) UnmarshalYAML(unmarshal func(interface{}) error) error {
 					}
 
 					c.Tasks[k] = t
-				} else if content, err := ioutil.ReadFile(r); err == nil {
+				} else if content, err := os.ReadFile(r); err == nil {
 					var t *task.Task
 					if err := yaml.Unmarshal([]byte(content), &t); err == nil {
 						c.Tasks[k] = t
@@ -135,8 +134,6 @@ func ReadFile(args ...string) (*Config, error) {
 	var dat []byte
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		path, err = os.Getwd()
-
 		files := []string{fmt.Sprintf("max_%s.yml", runtime.GOOS), "max.yml"}
 		if len(file) > 0 {
 			files = append([]string{file}, files...)
@@ -150,7 +147,7 @@ func ReadFile(args ...string) (*Config, error) {
 			file := filepath.Join(path, name)
 
 			if _, err := os.Stat(file); err == nil {
-				dat, err = ioutil.ReadFile(file)
+				dat, err = os.ReadFile(file)
 
 				if err == nil {
 					break
@@ -159,7 +156,7 @@ func ReadFile(args ...string) (*Config, error) {
 		}
 
 	} else {
-		dat, err = ioutil.ReadFile(path)
+		dat, err = os.ReadFile(path)
 	}
 
 	if err != nil {

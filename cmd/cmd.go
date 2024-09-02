@@ -91,15 +91,6 @@ func Execute() {
 		return
 	}
 
-	// Try to read max config file if nil.
-	if c == nil {
-		c, err = readConfig(configFile)
-		if err != nil {
-			log.Printf("max: %s\n", err.Error())
-			return
-		}
-	}
-
 	// Create a new runner.
 	runner := runner.New(
 		runner.Config(c),

@@ -6,12 +6,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"strings"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
+	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/client"
 	"github.com/frozzare/max/internal/backend"
@@ -27,7 +27,7 @@ type engine struct {
 
 // New returns a new Docker Engine using the given client.
 func New(config *config.Backend) (backend.Engine, error) {
-	client, err := client.NewEnvClient()
+	client, err := client.NewClientWithOpts()
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (e *engine) containerName(t *task.Task) string {
 // Setup setups the docker engine.
 func (e *engine) Setup(ctx context.Context, t *task.Task) error {
 	for _, vol := range e.volumes {
-		_, err := e.client.VolumeCreate(ctx, volume.VolumesCreateBody{
+		_, err := e.client.VolumeCreate(ctx, volume.CreateOptions{
 			Name:       vol.Name,
 			Driver:     vol.Driver,
 			DriverOpts: vol.DriverOpts,
@@ -71,7 +71,7 @@ func (e *engine) Setup(ctx context.Context, t *task.Task) error {
 
 // Exec execute a task in a docker container.
 func (e *engine) Exec(ctx context.Context, t *task.Task) error {
-	pullopts := types.ImagePullOptions{}
+	pullopts := image.PullOptions{}
 
 	// Add authentication credentials if any.
 	if t.Docker.Auth != nil && len(t.Docker.Auth.Username) > 0 && len(t.Docker.Auth.Password) > 0 {
@@ -84,7 +84,7 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 
 	rc, err := e.client.ImagePull(ctx, t.Docker.Image, pullopts)
 	if err == nil {
-		io.Copy(ioutil.Discard, rc)
+		io.Copy(io.Discard, rc)
 		rc.Close()
 	}
 
@@ -134,18 +134,20 @@ func (e *engine) Exec(ctx context.Context, t *task.Task) error {
 		Binds: t.Docker.Volumes.Values,
 	}
 
-	_, err = e.client.ContainerCreate(ctx, config, hostConfig, nil, e.containerName(t))
+	networkConfig := &network.NetworkingConfig{}
+
+	_, err = e.client.ContainerCreate(ctx, config, hostConfig, networkConfig, nil, e.containerName(t),)
 
 	if err != nil {
 		return err
 	}
 
-	return e.client.ContainerStart(ctx, e.containerName(t), types.ContainerStartOptions{})
+	return e.client.ContainerStart(ctx, e.containerName(t), container.StartOptions{})
 }
 
 // Logs return docker logs.
 func (e *engine) Logs(ctx context.Context, t *task.Task) (io.ReadCloser, error) {
-	return e.client.ContainerLogs(ctx, e.containerName(t), types.ContainerLogsOptions{
+	return e.client.ContainerLogs(ctx, e.containerName(t), container.LogsOptions{
 		Follow:     true,
 		ShowStdout: true,
 		ShowStderr: true,
@@ -157,7 +159,7 @@ func (e *engine) Logs(ctx context.Context, t *task.Task) (io.ReadCloser, error) 
 // Destroy destroys the docker container.
 func (e *engine) Destroy(ctx context.Context, t *task.Task) error {
 	e.client.ContainerKill(ctx, e.containerName(t), "9")
-	e.client.ContainerRemove(ctx, e.containerName(t), types.ContainerRemoveOptions{
+	e.client.ContainerRemove(ctx, e.containerName(t), container.RemoveOptions{
 		RemoveVolumes: true,
 		RemoveLinks:   false,
 		Force:         false,
@@ -172,8 +174,8 @@ func (e *engine) Destroy(ctx context.Context, t *task.Task) error {
 
 // Wait check if the container is done or not.
 func (e *engine) Wait(ctx context.Context, t *task.Task) (bool, error) {
-	_, err := e.client.ContainerWait(ctx, e.containerName(t))
-	if err != nil {
+	_, errC := e.client.ContainerWait(ctx, e.containerName(t), container.WaitConditionNextExit)
+	if err := <-errC; err != nil {
 		return false, err
 	}
 

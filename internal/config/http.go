@@ -1,7 +1,7 @@
 package config
 
 import (
-	"io/ioutil"
+	"io"
 
 	"github.com/frozzare/go/http2"
 	"github.com/frozzare/max/internal/cache"
@@ -31,7 +31,7 @@ func includeHTTPTask(url string, cache *cache.Cache) (*task.Task, error) {
 
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}

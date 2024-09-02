@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"mvdan.cc/sh/expand"
 	"mvdan.cc/sh/interp"
 	"mvdan.cc/sh/syntax"
 )
@@ -23,19 +24,30 @@ type Options struct {
 
 // Exec will execute a input cmd string.
 func Exec(opts *Options) error {
-	var path string
 
-	if len(opts.Dir) > 0 {
-		path = opts.Dir
+	if opts.Context == nil {
+		opts.Context = context.Background()
 	}
 
-	if len(path) == 0 {
+	if opts.Stdin == nil {
+		opts.Stdin = os.Stdin
+	}
+
+	if opts.Stdout == nil {
+		opts.Stdout = os.Stdout
+	}
+
+	if opts.Stderr == nil {
+		opts.Stderr = os.Stderr
+	}
+
+	if len(opts.Dir) == 0 {
 		wd, err := os.Getwd()
 		if err != nil {
 			return err
 		}
 
-		path = wd
+		opts.Dir = wd
 	}
 
 	p, err := syntax.NewParser().Parse(strings.NewReader(opts.Command), "")
@@ -45,25 +57,15 @@ func Exec(opts *Options) error {
 
 	env := os.Environ()
 	env = append(env, opts.Env...)
-	envi, err := interp.EnvFromList(env)
+	r, err := interp.New(
+		interp.Env(expand.ListEnviron(env...)),
+		interp.StdIO(opts.Stdin, opts.Stdout, opts.Stdout),
+		interp.Dir(opts.Dir),
+	)
+
 	if err != nil {
 		return err
 	}
 
-	r := interp.Runner{
-		Context: opts.Context,
-		Env:     envi,
-		Dir:     path,
-		Exec:    interp.DefaultExec,
-		Open:    interp.OpenDevImpls(interp.DefaultOpen),
-		Stdin:   opts.Stdin,
-		Stdout:  opts.Stdout,
-		Stderr:  opts.Stderr,
-	}
-
-	if err = r.Reset(); err != nil {
-		return err
-	}
-
-	return r.Run(p)
+	return r.Run(opts.Context, p)
 }

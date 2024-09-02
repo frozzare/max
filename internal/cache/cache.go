@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"go.etcd.io/bbolt"
+	bolt "go.etcd.io/bbolt"
 )
 
 const (

@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/frozzare/max/internal/config"
@@ -14,7 +14,7 @@ func readConfig(path string) (*config.Config, error) {
 
 	fi, err := os.Stdin.Stat()
 	if fi.Mode()&os.ModeNamedPipe != 0 {
-		buf, err := ioutil.ReadAll(os.Stdin)
+		buf, err := io.ReadAll(os.Stdin)
 
 		if err == nil {
 			c, err = config.ReadContent(string(buf))

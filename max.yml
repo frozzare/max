@@ -1,4 +1,8 @@
 tasks:
+  default:
+    summary: Hello
+    commands:
+      - echo "Hello"
   build:
     summary: Build docker image
     commands:
